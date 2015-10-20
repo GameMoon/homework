@@ -10,7 +10,7 @@ public class Main {
         Table table = new Table();
         Player john = new Player("John","semmi",400);
         Player bob = new Player("Bob","semmi",310);
-        Player valaki = new Player("Valaki","semmi",100);
+        Player valaki = new Player("Valakik","semmi",100);
 
         table.addPlayer(john);
         table.addPlayer(bob);
