@@ -1,2 +1,3 @@
-# homework
-Test Project
+# Poker
+
+Online poker szerver és kliens
