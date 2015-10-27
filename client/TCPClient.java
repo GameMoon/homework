@@ -44,5 +44,15 @@ public class TCPClient extends Thread{
         DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
         dataOut.writeBytes(data+ '\n');
     }
+    public String getCommand(){
+        String command = null;
+        if(!incomingCommands.isEmpty()){
+            command = incomingCommands.get(0);
+        }
+        return command;
+    }
+    public ArrayList<String> getAllCommand(){
+        return incomingCommands;
+    }
 
 }
