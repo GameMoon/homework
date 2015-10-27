@@ -5,38 +5,44 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
 
-/**
- * Created by ugrin on 2015. 10. 27..
- */
 public class TCPClient extends Thread{
-    private Socket clientsocket;
+    private Socket socket;
     private boolean running;
-    public TCPClient(int port){
+    private ArrayList<String> incomingCommands;
+    public TCPClient(String ip,int port){
         running = true;
+        incomingCommands = new ArrayList<>();
         try {
-            clientsocket = new Socket("localhost",port);
+            socket = new Socket(ip,port);
+            this.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Can't open that Socket ("+ip+":"+port+")");
         }
     }
     public void Stop(){
         running = false;
     }
     public void run(){
-        System.out.println("Client is running");
         try {
-            DataOutputStream dataout = new DataOutputStream(clientsocket.getOutputStream());
-            BufferedReader bfr = new BufferedReader(new InputStreamReader(System.in));
-            String text = null;
+            BufferedReader dataIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
             while(running){
-                text = bfr.readLine();
-                System.out.println("Sent to Server:"+ text);
-                dataout.writeBytes(text+ '\n');
+                if(socket.getInputStream().available()>0){
+                    String command = dataIn.readLine();
+                    if(command.equals("closed")) Stop();
+                    incomingCommands.add(command);
+                }
             }
-            clientsocket.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    public void sendCommand(String data) throws IOException {
+        DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
+        dataOut.writeBytes(data+ '\n');
+    }
+
 }
