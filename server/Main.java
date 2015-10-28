@@ -11,55 +11,45 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException {
-        /*Table table = new Table();
-        Player john = new Player("John","semmi",400);
-        Player bob = new Player("Bob","semmi",310);
-        Player valaki = new Player("Valakik","semmi",100);
+        System.out.println("Server started " + Constants.versionNumber);
+        boolean running = true;
+        GameManager gameManager = new GameManager();
 
-        table.addPlayer(john);
-        table.addPlayer(bob);
-        table.addPlayer(valaki);
 
-        System.out.println("Server started "+Constants.versionNumber);
-
-        table.start();
-        john.setReady(true);
-        bob.setReady(true);
-        valaki.setReady(true);
-
-        if(table.getState() == 2){
-        System.out.println("John: " + john.getCard(0).getId() + " | " + john.getCard(1).getId());
-        System.out.println("Bob: " + bob.getCard(0).getId() + " | " + bob.getCard(1).getId());
-        System.out.println("Valaki: " + valaki.getCard(0).getId() + " | " + valaki.getCard(1).getId());
-        }
-        */
-        String text = null;
         BufferedReader bfr = new BufferedReader(new InputStreamReader(System.in));
-        try {
-           text = bfr.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (running) {
+            String[] cmd = bfr.readLine().split(" ");
+            if (cmd[0].equals("getplayers")) {
+                System.out.println("Connected Players:");
+                for (Player p : gameManager.getPlayers()) {
+                    System.out.println(p.getName());
+                }
+            }
+            else if(cmd[0].equals("getcommands")){
+                gameManager.getReceievedCommands().forEach((k, c) -> System.out.println(k + ":" + c));
+            }
+            else if(cmd[0].equals("numberofcommands")){
+                System.out.println(gameManager.getReceievedCommands().size());
+            }
+            else if (cmd[0].equals("exit")) {
+                running = false;
+            }
+            else if (cmd[0].equals("start")) {
+                gameManager.start();
+                System.out.println("GameManager started!");
+            }
+            else if (cmd[0].equals("stop")) {
+                gameManager.Stop();
+                System.out.println("GameManager stopped!");
+            }
+            else if(cmd[0].equals("sendcommand")){
+                gameManager.tcpServer.sendCommand(gameManager.getPlayers().get(Integer.parseInt(cmd[1])).getSocket(),cmd[2]);
+            }
+            else{
+                System.out.println("Unknown command");
+            }
         }
-
-            if(text.equals("server")){
-                TCPServer server = new TCPServer(7658);
-                while(true){
-                    String cmd = bfr.readLine();
-                    if(cmd.equals("getdata")){
-                        server.getCommands().forEach((address,command)->System.out.println(address+": "+command));
-                    }
-                }
-
-            }
-            else {
-                if (text.equals("client")) {
-                    System.out.println("Add meg az ipt:");
-                    text = new BufferedReader(new InputStreamReader(System.in)).readLine();
-                    TCPClient client = new TCPClient(text,7658);
-                }
-            }
-
-
-
     }
+
 }
+
