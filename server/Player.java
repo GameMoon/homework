@@ -2,9 +2,6 @@ package server;
 
 import java.net.Socket;
 
-/**
- * Created by ugrin on 2015. 10. 20..
- */
 public class Player {
     private final String name;
     private final String password;

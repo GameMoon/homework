@@ -3,21 +3,18 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TCPServer extends Thread {
     private boolean running;
     private ServerSocket socket;
     private ArrayList<Socket> connectedClients;
-    private HashMap<Socket, String> incommingCommands;
+    private Map<Socket, String> incommingCommands;
 
     public TCPServer(int port) {
         running = true;
         connectedClients = new ArrayList<>();
-        incommingCommands = new HashMap<>();
+        incommingCommands = Collections.synchronizedMap(new HashMap<>());
         try {
             this.socket = new ServerSocket(port);
             this.start();
@@ -32,10 +29,17 @@ public class TCPServer extends Thread {
 
     @Override
     public void run() {
-        String input = null;
-        TCPConnectionListener connectionListener = new TCPConnectionListener(this,socket,connectedClients);
+        Socket newClient;
         while (running) { //Receiving Data
+            try {
+                newClient = socket.accept();
+               // newClient.setSoTimeout(Constants.maxTimedOut); ideiglenes
+                new TCPClientManager(newClient,this).start();
+                connectedClients.add(newClient);
 
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -51,12 +55,12 @@ public class TCPServer extends Thread {
             System.err.println("Failed to send command");
         }
     }
-    public HashMap<Socket, String> getCommands() {
+    public Map<Socket, String> getCommands() {
         return incommingCommands;
     }
 
     public void addCommand(Socket socket,String command){
-        incommingCommands.put(socket,command);
+            incommingCommands.put(socket, command);
     }
     public void disconnect(Socket socket,Constants.Connection con){
         connectedClients.remove(socket);

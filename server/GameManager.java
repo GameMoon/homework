@@ -2,76 +2,70 @@ package server;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameManager extends Thread{
+public class GameManager extends Thread {
     public TableManager tableManager;
     public ArrayList<Player> players;
     public TCPServer tcpServer;
     private boolean running;
 
-    public GameManager(){
+    public GameManager() {
         tableManager = new TableManager(Constants.defualtTableNumber);
         players = new ArrayList<>();
         tcpServer = new TCPServer(Constants.serverPort);
         running = true;
     }
-    public void run(){
-        while(running){
+
+    public void run() {
+        while (running) {
             updatePlayers(tcpServer.getCommands());
         }
     }
-    public HashMap<Socket,String> getReceievedCommands(){
+
+    public Map<Socket, String> getReceievedCommands() {
         return tcpServer.getCommands();
     }
-    public void updatePlayers(Map<Socket,String> commands){
-       synchronized (commands){
 
-        if(commands.size() > 0){
+    public void updatePlayers(Map<Socket, String> commands) {
             ArrayList<Socket> usedCommands = new ArrayList<>();
-            for(Socket socket : commands.keySet()){
-                String command = commands.get(socket);
-                if(command.contains("$-start")){
-                    String[] userdata = command.split("-");
-                    Player newPlayer = new Player(userdata[2],userdata[3],100,socket);
-                    sendMessage(newPlayer.getName()+" is connected");
-                    if(!players.contains(newPlayer))  players.add(newPlayer);
-                    usedCommands.add(socket);
-                }
-                else if(command.contains("$-stop")){
-                    for(Player p : players){
-                        if(p.getSocket() == socket){
-                            players.remove(p);
-                            sendMessage(p.getName()+" is disconnected");
-                            break;
-                        }
+            commands.keySet().forEach((socket) -> {
+                String[] command = commands.get(socket).split("-");
+                if (command[0].equals("$") && command[command.length - 1].equals("$")) {
+                    if (command[1].equals("start")) {
+                        Player newPlayer = new Player(command[2], command[3], 100, socket);
+                        if (!players.contains(newPlayer)) players.add(newPlayer);
+                        usedCommands.add(socket);
+                    } else if (command[1].equals("stop")) {
+                        players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());
+                        usedCommands.add(socket);
+                    } else if (command[1].equals("timedout")) {
+                        players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());
+                        usedCommands.add(socket);
+                    } else if (command[1].equals("chat")) {
+                        Player sender = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
+                        sendMessage("[Chat] "+sender.getName()+":"+command[2]);
+                        players.forEach((p) -> {
+                                this.tcpServer.sendCommand(p.getSocket(),"$-chat-"+sender.getName()+"-"+command[2]+"-$");
+                        });
+                        usedCommands.add(socket);
                     }
-                    usedCommands.add(socket);
                 }
-                else if(command.contains("$-timedout")){
-                    for(Player p : players){
-                        if(p.getSocket() == socket){
-                            players.remove(p);
-                            sendMessage(p.getName()+" is timed out");
-                            break;
-                        }
-                    }
-                    usedCommands.add(socket);
-                }
-            }
-            for(Socket key: usedCommands){
-                commands.remove(key);
-            }
-        }}
+            });
+            usedCommands.forEach((key) -> commands.remove(key));
     }
-    private void sendMessage(String text){
-        System.out.println("[Server] "+text);
+
+    private void sendMessage(String text) {
+        System.out.println("[Server]" + text);
     }
-    public ArrayList<Player> getPlayers(){
+
+    public ArrayList<Player> getPlayers() {
         return players;
     }
-    public void Stop(){
+
+    public void Stop() {
         running = false;
     }
 }
