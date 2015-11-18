@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 public class MD {
-	public static byte[] Mdhash(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException{
+	public static String Mdhash(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException{
 		byte[] premessage;
 
 		premessage = text.getBytes("UTF-8");
@@ -20,7 +20,7 @@ public class MD {
    	     	if(hex.length()==1) hexString.append('0');
    	     	hexString.append(hex);
     	}
-    	System.out.println(hexString);
-		return message;
+    	//System.out.println(hexString.toString());
+		return hexString.toString();
 	}
 }

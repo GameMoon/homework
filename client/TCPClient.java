@@ -11,14 +11,11 @@ public class TCPClient extends Thread{
     private Socket socket;
     private boolean running;
     private ArrayList<String> incomingCommands;
-    private String name;
-    private String password;
-
-    public TCPClient(String name,String password,String ip,int port){
+   
+    public TCPClient(String ip,int port){
         running = true;
         incomingCommands = new ArrayList<>();
-        this.name = name;
-        this.password = password;
+       
 
         try {
             socket = new Socket(ip,port);
@@ -33,7 +30,7 @@ public class TCPClient extends Thread{
     public void run(){
         try {
             BufferedReader dataIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            sendCommand("$-start-"+name+"-"+password+"-$");
+           // sendCommand("$-start-"+name+"-"+password+"-$");
             while(running){
                 if(socket.getInputStream().available()>0){
                     String command = dataIn.readLine();
