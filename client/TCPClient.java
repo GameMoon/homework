@@ -11,11 +11,11 @@ public class TCPClient extends Thread{
     private Socket socket;
     private boolean running;
     private ArrayList<String> incomingCommands;
-   
+
     public TCPClient(String ip,int port){
         running = true;
         incomingCommands = new ArrayList<>();
-       
+
 
         try {
             socket = new Socket(ip,port);
@@ -30,12 +30,14 @@ public class TCPClient extends Thread{
     public void run(){
         try {
             BufferedReader dataIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-           // sendCommand("$-start-"+name+"-"+password+"-$");
             while(running){
                 if(socket.getInputStream().available()>0){
                     String command = dataIn.readLine();
                     if(command.equals("closed")) Stop();
-                    incomingCommands.add(command);
+                    synchronized (incomingCommands){
+                        incomingCommands.add(command);
+                        notify();
+                    }
                 }
             }
             socket.close();
@@ -49,8 +51,15 @@ public class TCPClient extends Thread{
     }
     public String getCommand(){
         String command = null;
-        if(!incomingCommands.isEmpty()){
-            command = incomingCommands.get(0);
+        synchronized (incomingCommands){
+            if(incomingCommands.isEmpty()){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else command = incomingCommands.get(0);
             incomingCommands.remove(0);
         }
         return command;
