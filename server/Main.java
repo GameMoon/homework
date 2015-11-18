@@ -8,8 +8,6 @@ public class Main {
 
         GameManager gameManager = new GameManager();
         CommandListener commandListener = new CommandListener(gameManager);
-
-
     }
 
 }
