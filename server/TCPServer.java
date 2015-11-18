@@ -3,25 +3,23 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class TCPServer extends Thread {
     private boolean running;
     private ServerSocket socket;
-    private ArrayList<Socket> clients;
-    private HashMap<String, String> incommingCommands;
+    private ArrayList<Socket> connectedClients;
+    private Map<Socket, String> incommingCommands;
 
     public TCPServer(int port) {
         running = true;
-        clients = new ArrayList<>();
-        incommingCommands = new HashMap<>();
+        connectedClients = new ArrayList<>();
+        incommingCommands = Collections.synchronizedMap(new HashMap<>());
         try {
             this.socket = new ServerSocket(port);
             this.start();
         } catch (IOException e) {
-           System.err.println("Failed to start the server");
+            System.err.println("Failed to start the server");
         }
     }
 
@@ -31,34 +29,22 @@ public class TCPServer extends Thread {
 
     @Override
     public void run() {
-        String input = null;
-        TCPConnectionListener connectionListener = new TCPConnectionListener(socket, clients);
-        ArrayList<Socket> timedOutSockets = new ArrayList<>();
+        Socket newClient;
         while (running) { //Receiving Data
-            synchronized (clients) {
-                for (Socket client : clients) {
-                    try {
-                        int first = client.getInputStream().read();
-                        if (first > 0) {
-                            BufferedReader dataIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                            synchronized (incommingCommands) {
-                                incommingCommands.put(client.getInetAddress().getHostAddress() + ":" + client.getPort(), (char)(first) + dataIn.readLine());
-                            }
-                        }
-                    } catch(SocketTimeoutException e){
-                        sendCommand(client,"closed");
-                        timedOutSockets.add(client);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                clients.removeAll(timedOutSockets); // Deleting timedout sockets
+            try {
+                newClient = socket.accept();
+               // newClient.setSoTimeout(Constants.maxTimedOut); ideiglenes
+                new TCPClientManager(newClient,this).start();
+                connectedClients.add(newClient);
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public HashMap<String, String> getCommands() {
-        return incommingCommands;
+    public ArrayList<Socket> getClientsSocket() {
+        return connectedClients;
     }
 
     public void sendCommand(Socket client, String data) {
@@ -66,7 +52,20 @@ public class TCPServer extends Thread {
             DataOutputStream dataout = new DataOutputStream(client.getOutputStream());
             dataout.writeBytes(data + '\n');
         } catch (IOException e) {
-           System.err.println("Failed to send command");
+            System.err.println("Failed to send command");
         }
     }
+    public Map<Socket, String> getCommands() {
+        return incommingCommands;
+    }
+
+    public void addCommand(Socket socket,String command){
+            incommingCommands.put(socket, command);
+    }
+    public void disconnect(Socket socket,Constants.Connection con){
+        connectedClients.remove(socket);
+        if(con == Constants.Connection.TIMED_OUT){
+        sendCommand(socket, "closed");}
+    }
+
 }

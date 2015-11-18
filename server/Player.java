@@ -1,8 +1,7 @@
 package server;
 
-/**
- * Created by ugrin on 2015. 10. 20..
- */
+import java.net.Socket;
+
 public class Player {
     private final String name;
     private final String password;
@@ -10,18 +9,19 @@ public class Player {
     private int money;
     private int tableId;
     private int tableSeat;
+    private Socket socket;
     private Card[] cards;
 
-    public Player(String name,String password,int money){
+    public Player(String name,String password,int money,Socket socket){
         this.name = name;
         this.password = password;
         this.money = money;
         isReady = false;
         cards = new Card[2];
+        this.socket = socket;
     }
-    public Card getCard(int index){
-        return cards[index];
-    }
+    public Socket getSocket(){ return socket;}
+    public Card getCard(int index){return cards[index];}
     public void setCard(int index,Card c){
         cards[index] = c;
     }
