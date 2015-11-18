@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Random;
 
-/**
- * Created by ugrin on 2015. 10. 27..
- */
 public class ClientTest {
     private static String text;
 

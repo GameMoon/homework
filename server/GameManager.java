@@ -1,10 +1,7 @@
 package server;
 
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GameManager extends Thread {
     public TableManager tableManager;
@@ -39,10 +36,12 @@ public class GameManager extends Thread {
                         if (!players.contains(newPlayer)) players.add(newPlayer);
                         usedCommands.add(socket);
                     } else if (command[1].equals("stop")) {
-                        players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());
+                        try{ players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());}
+                        catch (NoSuchElementException e){}
                         usedCommands.add(socket);
                     } else if (command[1].equals("timedout")) {
-                        players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());
+                        try{ players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());}
+                        catch (NoSuchElementException e){}
                         usedCommands.add(socket);
                     } else if (command[1].equals("chat")) {
                         Player sender = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
