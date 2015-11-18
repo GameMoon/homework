@@ -36,7 +36,6 @@ public class TCPClient extends Thread{
                     if(command.equals("closed")) Stop();
                     synchronized (incomingCommands){
                         incomingCommands.add(command);
-                        notify();
                     }
                 }
             }
@@ -52,14 +51,8 @@ public class TCPClient extends Thread{
     public String getCommand(){
         String command = null;
         synchronized (incomingCommands){
-            if(incomingCommands.isEmpty()){
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            else command = incomingCommands.get(0);
+            while(incomingCommands.size()==0);
+            command = incomingCommands.get(0);
             incomingCommands.remove(0);
         }
         return command;
