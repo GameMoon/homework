@@ -7,38 +7,36 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class TCPClient extends Thread{
+public class TCPClient extends Thread {
     private Socket socket;
     private boolean running;
     private ArrayList<String> incomingCommands;
-    private String name;
-    private String password;
 
-    public TCPClient(String name,String password,String ip,int port){
+    public TCPClient(String ip, int port) {
         running = true;
         incomingCommands = new ArrayList<>();
-        this.name = name;
-        this.password = password;
+
 
         try {
-            socket = new Socket(ip,port);
+            socket = new Socket(ip, port);
             this.start();
         } catch (IOException e) {
-            System.err.println("Can't open that Socket ("+ip+":"+port+")");
+            System.err.println("Can't open that Socket (" + ip + ":" + port + ")");
         }
     }
-    public void Stop(){
+
+    public void Stop() {
         running = false;
     }
-    public void run(){
+
+    public void run() {
         try {
             BufferedReader dataIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            sendCommand("$-start-"+name+"-"+password+"-$");
-            while(running){
-                if(socket.getInputStream().available()>0){
+            while (running) {
+                if (socket.getInputStream().available() > 0) {
                     String command = dataIn.readLine();
-                    if(command.equals("closed")) Stop();
-                    incomingCommands.add(command);
+                    if (command.equals("closed")) Stop();
+                        incomingCommands.add(command);
                 }
             }
             socket.close();
@@ -46,19 +44,22 @@ public class TCPClient extends Thread{
             e.printStackTrace();
         }
     }
+
     public void sendCommand(String data) throws IOException {
         DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
-        dataOut.writeBytes(data+ '\n');
+        dataOut.writeBytes(data + '\n');
     }
-    public String getCommand(){
+
+    public String getCommand() {
         String command = null;
-        if(!incomingCommands.isEmpty()){
+        if (!incomingCommands.isEmpty()) {
             command = incomingCommands.get(0);
             incomingCommands.remove(0);
         }
         return command;
     }
-    public ArrayList<String> getAllCommand(){
+
+    public ArrayList<String> getAllCommand() {
         return incomingCommands;
     }
 

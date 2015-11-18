@@ -3,8 +3,10 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,7 +14,13 @@ import java.security.NoSuchAlgorithmException;
 import javax.swing.*;
 
 public class authentikation extends JFrame {
-	public authentikation(){
+	private TCPClient T;
+	String sendpassword;
+	String sendusername;
+	public authentikation(TCPClient TA){
+		T=TA;
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation(dim.width/3-this.getSize().width/2,(dim.height/2-this.getSize().height/2));
 		setTitle("Login");
 		JPanel top= new JPanel();
 		JPanel mid= new JPanel();
@@ -35,15 +43,40 @@ public class authentikation extends JFrame {
 					//world.setText("");
 					try {
 						//MD.Mdhash(name.getText());
-						MD.Mdhash(word.getText());
+						sendpassword=MD.Mdhash(word.getText());
+						sendusername=name.getText();
+						T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
+
 					} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					while(T.getAllCommand().size()==0);
+					//System.out.println(T.getAllCommand().size());
+					String command=T.getCommand();
+					System.out.println(command);
+					if(command.equals("$-ok-$")){
+						try {
+							T.sendCommand("$-start-"+sendusername+"-"+sendpassword+"-$");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						App poker= new App();
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
+					}
+					T.getAllCommand().clear();
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null,"nem tudok angolul", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT(1)", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
 					//name.setText("");
 					//word.setText("");
 				}
@@ -56,7 +89,7 @@ public class authentikation extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				registration rg=new registration(); 
-				
+
 			}
 
 		});
@@ -66,7 +99,7 @@ public class authentikation extends JFrame {
 		mid.add(name);
 		mid.add(pass);
 		mid.add(word);
-		
+
 		down.add(login);
 		down.add(reg);
 
@@ -81,5 +114,5 @@ public class authentikation extends JFrame {
 
 	}
 
-	
+
 }
