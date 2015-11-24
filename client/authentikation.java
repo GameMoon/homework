@@ -41,11 +41,12 @@ public class authentikation extends JFrame {
 				if((!name.getText().equals("")) && (!word.getText().equals(""))) {
 					//name.setText("");
 					//world.setText("");
+					String command="fake";
 					try {
-						//MD.Mdhash(name.getText());
 						sendpassword=MD.Mdhash(word.getText());
 						sendusername=name.getText();
 						T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
+						//command=T.getCommand();
 
 					} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
 						// TODO Auto-generated catch block
@@ -55,24 +56,29 @@ public class authentikation extends JFrame {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-					while(T.getAllCommand().size()==0);
-					//System.out.println(T.getAllCommand().size());
-					String command=T.getCommand();
+
+
+
+					while(command.equals("fake")){
+						command=T.getCommand();
+					};
 					System.out.println(command);
-					if(command.equals("$-ok-$")){
+					//System.out.println(T.getAllCommand().size());
+
+					System.out.println(T.getAllCommand().size());
+					if(command!=null && command.equals("$-ok-$")){
 						try {
 							T.sendCommand("$-start-"+sendusername+"-"+sendpassword+"-$");
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						App poker= new App();
+						App poker= new App(T);
 					}
 					else{
 						JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
 					}
-					T.getAllCommand().clear();
+
 				}
 				else
 				{
