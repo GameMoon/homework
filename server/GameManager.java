@@ -4,18 +4,21 @@ import java.net.Socket;
 import java.util.*;
 
 public class GameManager extends Thread {
-    public TableManager tableManager;
-    public ArrayList<Player> players;
-    public TCPServer tcpServer;
+    private TableManager tableManager;
+    private ArrayList<Player> players;
+    private TCPServer tcpServer;
+    private DataBase dataBase;
     private boolean running;
 
     public GameManager() {
         tableManager = new TableManager(Constants.defualtTableNumber);
+        dataBase = new DataBase();
         players = new ArrayList<>();
         tcpServer = new TCPServer(Constants.serverPort);
         running = true;
     }
-
+    public TCPServer getTCPServer(){return tcpServer;}
+    public DataBase getDataBase(){ return dataBase;}
     public void run() {
         while (running) {
             updatePlayers(tcpServer.getCommands());
@@ -32,32 +35,26 @@ public class GameManager extends Thread {
             String[] command = commands.get(socket).split("-");
             if (command[0].equals("$") && command[command.length - 1].equals("$")) {
                 if (command[1].equals("verify")) {
-                    boolean jo = true;
-                    for(Player p : players){
-                       if(p.getName().equals(command[2])) jo = false;
-                    }
-                    if(jo && command[3].equals("f10e2821bbbea527ea02200352313bc059445190")){
-                        tcpServer.sendCommand(socket,"$-ok-$");
-                        System.out.println(socket+"belpett");
-                    }
-                    else
-                    {  tcpServer.sendCommand(socket,"$-nemok-$");
-                        System.out.println(socket+"nembelpett");
-                    }
-
+                    if(dataBase.checkCredentials(command[2],command[3])){  tcpServer.sendCommand(socket,"$-ok-$");}
+                    else tcpServer.sendCommand(socket,"$-error-wrongusernameorpassword-$");
                     usedCommands.add(socket);
                 } else if (command[1].equals("start")) {
-                    Player newPlayer = new Player(command[2], command[3], 100, socket);
+                    Player newPlayer = new Player(command[2], command[3], dataBase.getMoney(command[2]), socket);
                     sendMessage("Connected: " + newPlayer.getName() + " password: " + newPlayer.getPassword());
                     if (!players.contains(newPlayer)) players.add(newPlayer);
                     usedCommands.add(socket);
-                } else if (command[1].equals("stop")) {
-                    try{ players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());}
+                } else if (command[1].equals("stop") || command[1].equals("timedout")) {
+                    try{ Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
+                         dataBase.setMoney(currentPlayer.getName(),currentPlayer.getMoney());
+                         players.remove(currentPlayer);
+                    }
                     catch (NoSuchElementException e){}
                     usedCommands.add(socket);
-                } else if (command[1].equals("timedout")) {
-                    try{ players.remove(players.stream().filter((p) -> p.getSocket() == socket).findFirst().get());}
-                    catch (NoSuchElementException e){}
+                } else if (command[1].equals("register")) {
+                    if(dataBase.addNewUser(command[2],command[3]))
+                        sendMessage("New User registered"+command[2]+" - "+command[3]);
+                    else
+                        tcpServer.sendCommand(socket,"$-error-userisalreadyexists-$");
                     usedCommands.add(socket);
                 } else if (command[1].equals("chat")) {
                     Player sender = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
