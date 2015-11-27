@@ -38,7 +38,7 @@ public class TCPClient extends Thread {
             while (running) {
                 if (socket.getInputStream().available() > 0) {
                     String command = dataIn.readLine();
-                    System.out.println(command);
+                    //System.out.println(command);
                     if (command.equals("closed")) Stop();
                     incomingCommands.add(command);
                 }

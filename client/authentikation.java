@@ -49,7 +49,7 @@ public class authentikation extends JFrame {
 						sendpassword=MD.Mdhash(word.getText());
 						sendusername=Normalizer.normalize(name.getText(),Normalizer.Form.NFD);
 						T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
-						//command=T.getCommand();
+						
 
 					} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
 						// TODO Auto-generated catch block
