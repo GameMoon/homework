@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 
 import javax.swing.*;
 
@@ -17,6 +18,8 @@ public class authentikation extends JFrame {
 	private TCPClient T;
 	String sendpassword;
 	String sendusername;
+	static JButton login;
+	static JButton reg;
 	public authentikation(TCPClient TA){
 		T=TA;
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -31,9 +34,9 @@ public class authentikation extends JFrame {
 		topLabel.setFont(new Font(null, Font.PLAIN, 18));
 		JTextField name= new JTextField();
 		name.setColumns(15);
-		JTextField word= new JTextField();
+		JPasswordField word= new JPasswordField();
 		word.setColumns(15);
-		JButton login=new JButton("Login");
+		login=new JButton("Login");
 		login.addActionListener(new ActionListener(){
 
 			@Override
@@ -44,7 +47,7 @@ public class authentikation extends JFrame {
 					String command="fake";
 					try {
 						sendpassword=MD.Mdhash(word.getText());
-						sendusername=name.getText();
+						sendusername=Normalizer.normalize(name.getText(),Normalizer.Form.NFD);
 						T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
 						//command=T.getCommand();
 
@@ -74,6 +77,7 @@ public class authentikation extends JFrame {
 							e.printStackTrace();
 						}
 						App poker= new App(T);
+						dispose();
 					}
 					else{
 						JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
@@ -89,13 +93,14 @@ public class authentikation extends JFrame {
 			}
 
 		});
-		JButton reg = new JButton("Registration");
+		reg = new JButton("Registration");
 		reg.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				registration rg=new registration(); 
-
+				registration rg=new registration(T); 
+				login.setEnabled(false);
+				reg.setEnabled(false);
 			}
 
 		});
