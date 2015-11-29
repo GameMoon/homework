@@ -1,6 +1,7 @@
 package server;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ugrin on 2015. 10. 20..
@@ -8,14 +9,15 @@ import java.util.ArrayList;
 public class Table {
     private static int idCounter;
     private int id;
-    private ArrayList<Player> players;
+    private CopyOnWriteArrayList<Player> players;
     private Game game;
 
-    public Table(){
+    public Table(TCPServer tcpServer){
         id = idCounter; //unique ID generate
         idCounter++;
-        players = new ArrayList<Player>();
-        game = new Game(id,players);
+        players = new CopyOnWriteArrayList<Player>();
+        game = new Game(id,players,tcpServer);
+        game.start();
     }
     public void addPlayer(Player p){
         players.add(p);
@@ -32,6 +34,8 @@ public class Table {
     public int getState(){
         return game.getCurrentState();
     }
+    public boolean isFull(){ return (players.size()==8);}
+    public Game getGame(){ return game;}
     public void start(){
         game.start();
     }

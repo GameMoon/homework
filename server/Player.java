@@ -18,6 +18,8 @@ public class Player {
         this.money = money;
         isReady = false;
         cards = new Card[2];
+        setCard(0,new Card(53));
+        setCard(1,new Card(53));
         this.socket = socket;
     }
     public Socket getSocket(){ return socket;}

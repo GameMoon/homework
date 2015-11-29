@@ -4,16 +4,18 @@ import java.util.ArrayList;
 
 public class TableManager {
     private ArrayList<Table> tables;
+    private TCPServer tcpServer;
 
-    public TableManager(int numberOfTables) {
+    public TableManager(int numberOfTables,TCPServer tcpServer) {
+        this.tcpServer = tcpServer;
         tables = new ArrayList<>();
         for (int k = 0; k < numberOfTables; k++) {
-            tables.add(new Table());
+            tables.add(new Table(tcpServer));
         }
     }
 
     public void addTable() {
-        tables.add(new Table());
+        tables.add(new Table(tcpServer));
     }
 
     public void removeTable(int index) {

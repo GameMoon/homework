@@ -35,9 +35,8 @@ public class DataBase {
             if (rs.first()) return rs.getString("Password").equals(password);
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-
-
         return false;
     }
 
@@ -46,7 +45,6 @@ public class DataBase {
             stmt.execute("INSERT INTO users (Name, Password, Money) VALUES ('" + userName + "','" + password + "'," + 100 + ");");
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -55,7 +53,6 @@ public class DataBase {
         try {
             stmt.execute("DELETE FROM users WHERE Name='" + userName + "'");
         } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -63,7 +60,6 @@ public class DataBase {
         try {
             stmt.execute("UPDATE users SET Money=" + money + " WHERE Name = '" + userName + "'");
         } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -73,7 +69,6 @@ public class DataBase {
             rs = stmt.executeQuery("SELECT Money FROM users WHERE Name = '" + userName + "'");
             if (rs.first()) return rs.getInt("Money");
         } catch (SQLException e) {
-            e.printStackTrace();
         }
         return -1;
     }

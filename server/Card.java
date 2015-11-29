@@ -7,7 +7,7 @@ import java.util.Random;
  * Created by ugrin on 2015. 10. 20..
  */
 public class Card {
-    private int id;
+    private int id = 53;
 
     public Card(int id){
         this.id = id;
