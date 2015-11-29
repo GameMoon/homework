@@ -4,11 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 public class MD {
-	public static String Mdhash(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException{
+	public static  String Mdhash(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException{
 		byte[] premessage;
 
 		premessage = text.getBytes("UTF-8");
-		//System.out.println(premessage);
 	
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		md.update(premessage);

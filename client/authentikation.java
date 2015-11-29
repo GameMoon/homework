@@ -18,8 +18,9 @@ public class authentikation extends JFrame {
 	private TCPClient T;
 	String sendpassword;
 	String sendusername;
-	static JButton login;
-	static JButton reg;
+	 static JButton login;
+	 static JButton reg;
+	int money;
 	public authentikation(TCPClient TA){
 		T=TA;
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -42,8 +43,6 @@ public class authentikation extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if((!name.getText().equals("")) && (!word.getText().equals(""))) {
-					//name.setText("");
-					//world.setText("");
 					String command="fake";
 					try {
 						sendpassword=MD.Mdhash(word.getText());
@@ -65,10 +64,7 @@ public class authentikation extends JFrame {
 					while(command.equals("fake")){
 						command=T.getCommand();
 					};
-					System.out.println(command);
-					//System.out.println(T.getAllCommand().size());
-
-					System.out.println(T.getAllCommand().size());
+					
 					if(command!=null && command.equals("$-ok-$")){
 						try {
 							T.sendCommand("$-start-"+sendusername+"-"+sendpassword+"-$");
@@ -76,6 +72,7 @@ public class authentikation extends JFrame {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+					
 						App poker= new App(T);
 						dispose();
 					}
@@ -87,8 +84,6 @@ public class authentikation extends JFrame {
 				else
 				{
 					JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT(1)", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
-					//name.setText("");
-					//word.setText("");
 				}
 			}
 
