@@ -75,7 +75,18 @@ public class GameManager extends Thread {
                     else sender.setReady(true);
                     System.out.println(sender.getName()+" is ready");
                     usedCommands.add(socket);
+                } else if(command[1].equals("raise")){
+                    Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
+                    currentPlayer.setAction(Player.Action.RAISE);
+                    currentPlayer.setRaiseAmmount(Integer.parseInt(command[2]));
+                } else if(command[1].equals("call")){
+                    Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
+                    currentPlayer.setAction(Player.Action.CALL);
+                } else if(command[1].equals("fold")){
+                    Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
+                    currentPlayer.setAction(Player.Action.FOLD);
                 }
+
             }
         });
         usedCommands.forEach((key) -> commands.remove(key));

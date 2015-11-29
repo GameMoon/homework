@@ -19,8 +19,9 @@ public class Card {
         return id % 13;
     }
     public int getValue(){// 2 3 4 5 6 7 8 9 10 11 12 13 14
-        return id % 4;
+        return id -(13*getType())+1;
     }
+    public void setId(int id){this.id = id;}
     public static Card getRandomCard(ArrayList<Card> deck){
 
         Random rdm = new Random();
