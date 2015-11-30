@@ -18,8 +18,8 @@ public class authentikation extends JFrame {
 	private TCPClient T;
 	String sendpassword;
 	String sendusername;
-	 static JButton login;
-	 static JButton reg;
+	static JButton login;
+	static JButton reg;
 	int money;
 	public authentikation(TCPClient TA){
 		T=TA;
@@ -47,8 +47,13 @@ public class authentikation extends JFrame {
 					try {
 						sendpassword=MD.Mdhash(word.getText());
 						sendusername=Normalizer.normalize(name.getText(),Normalizer.Form.NFD);
-						T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
-						
+						if(T.isAlive()){
+							T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
+						}
+						else {
+							System.out.println("Nincs Socket");
+							return;
+						}
 
 					} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
 						// TODO Auto-generated catch block
@@ -64,7 +69,7 @@ public class authentikation extends JFrame {
 					while(command.equals("fake")){
 						command=T.getCommand();
 					};
-					
+
 					if(command!=null && command.equals("$-ok-$")){
 						try {
 							T.sendCommand("$-start-"+sendusername+"-"+sendpassword+"-$");
@@ -72,8 +77,8 @@ public class authentikation extends JFrame {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					
-						App poker= new App(T);
+
+						App poker= new App(T,sendusername);
 						dispose();
 					}
 					else{

@@ -1,11 +1,12 @@
 package client;
 
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
 public class Main {
 	
 	public static void main(String args[]){
-		//App a= new App(TC);
-	
-		TCPClient TC= new TCPClient("80.99.226.156",7658);
+		TCPClient TC= new TCPClient("152.66.155.125",7658);
 		authentikation a= new authentikation(TC);
 
 	}

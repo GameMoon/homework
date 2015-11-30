@@ -8,17 +8,19 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class Raise extends JFrame {
 TCPClient T;
 JTextField money;
-	public Raise(TCPClient t) {
+App app;
+	public Raise(TCPClient t,App b) {
+		app=b;
 		T=t;
 		money=new JTextField();
 		money.setColumns(4);
-		App.check.setEnabled(false);
-		App.raise.setEnabled(false);
-		App.fold.setEnabled(false);
+		app.bnotallowed();
 		JButton raisebutton= new JButton("Raise");
 		raisebutton.addActionListener(new ActionListener(){
 
@@ -32,18 +34,12 @@ JTextField money;
 						nummer++;
 					}
 				}
-				if(!money.getText().equals("") && nummer==money.getText().length()){
-					System.out.println(nummer+"zahl");
+				if(!money.getText().equals("") && Integer.parseInt(money.getText())>0 && nummer==money.getText().length() && Integer.parseInt(money.getText())<=Integer.parseInt(App.acounttable.getText())){
 					try {
-						T.sendCommand("$-command-raise-"+"money.getText()"+"-$");
+						T.sendCommand("$-raise-"+money.getText()+"-$");
 					} catch (IOException e) {
 						e.printStackTrace();
-					}
-					 
-					
-					App.check.setEnabled(true);
-					App.raise.setEnabled(true);
-					App.fold.setEnabled(true);
+					}	
 					dispose();
 				}
 				else{
@@ -52,7 +48,29 @@ JTextField money;
 			}
 			
 		});
-		JLabel acount= new JLabel("Your acount: "+App.acounttable.getText());
+		JLabel acount= new JLabel("Your acount: "+app.acounttable.getText());
+		money.getDocument().addDocumentListener(new DocumentListener(){
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
+				
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
+				
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
+				
+			}
+			
+		});
+		
 		acount.setFont(new Font(null, Font.PLAIN, 16));
 		
 		add(acount,BorderLayout.NORTH);
@@ -63,8 +81,6 @@ JTextField money;
 		setResizable(false);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		
-		
 	}
 
 }
