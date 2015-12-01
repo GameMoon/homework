@@ -4,6 +4,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
 public class WindowAppListener implements WindowListener {
 	TCPClient T;
 	public WindowAppListener(TCPClient t2) {
@@ -18,12 +20,11 @@ public class WindowAppListener implements WindowListener {
 
 	@Override
 	public void windowClosed(WindowEvent arg0) {
-		try {
-			T.sendCommand("$-stop-$");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+			
+
+		
+		
 	}
 	@Override
 	public void windowClosing(WindowEvent e) {

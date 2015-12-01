@@ -41,6 +41,7 @@ public class Game extends JPanel{
 	};
 	App aa;
 	int dealerId=0;
+	int actualId=0;
 	public Game(App a){
 		aa=a;
 		flop[0]=53;
@@ -116,29 +117,28 @@ public class Game extends JPanel{
 		g.drawImage(getImageofCard(a),500,200,null);
 	}
 	public void playername(Graphics g){
-		//int k=0;
 		if(aa.name==null){return;}
 		g.setColor(Color.YELLOW);
 		g.setFont(new Font(null, Font.PLAIN, 15));
 		for(int k=0;k<aa.players.keySet().size();k++ ){
+			if(k==actualId){g.setColor(Color.CYAN);}
 			String player=aa.players.keySet().toArray()[k].toString();
 			g.drawString(player, splitkoord[k][0], splitkoord[k][1]-30);
 			g.drawString(Integer.toString(aa.players.get(player)[0]), splitkoord[k][0], splitkoord[k][1]-16);
+			if((aa.players.get(player)[2])!=53){
+				g.drawImage(getImageofCard(aa.players.get(player)[2]),splitkoord[k][0]+10,splitkoord[k][1]-10,null);
+			}
 			if((aa.players.get(player)[1]!=53)){
 				g.drawImage(getImageofCard(aa.players.get(player)[1]),splitkoord[k][0],splitkoord[k][1],null);
 			}
-			if((aa.players.get(player)[2])!=53){
-				g.drawImage(getImageofCard(aa.players.get(player)[2]),splitkoord[k][0]-10,splitkoord[k][1]-10,null);
-			}
-			System.out.println(player);
-			//k++;
+			g.setColor(Color.YELLOW);
 		}
 	}
 	public void dealerprint(int a,Graphics g){
 		if(splitkoord[a][1]>=200 && 650!=splitkoord[a][0]){
-			g.drawImage(dealerimagemin, splitkoord[a][0]+50,splitkoord[a][1] , this);
+			g.drawImage(dealerimagemin, splitkoord[a][0]+100,splitkoord[a][1] , this);
 			if(splitkoord[a][0]==650){
-				g.drawImage(dealerimagemin, splitkoord[a][0]-50,splitkoord[a][1] , this);
+				g.drawImage(dealerimagemin, splitkoord[a][0]-70,splitkoord[a][1] , this);
 			}
 		}
 		else {

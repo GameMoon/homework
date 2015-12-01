@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,24 +35,27 @@ public class App extends JFrame {
 	JTextField chatfield;
 	JTextArea chatarea;
 	JScrollPane chatscroll;
+	JLabel acountlabel;
+	JLabel mainpotlabel;
 	int money;
-
 	int playersnum;   
-	ConcurrentHashMap<String,int[]> players= new ConcurrentHashMap<String,int[]>();
+	Color neu;
+	Color gold;
+	LinkedHashMap<String,int[]> players= new LinkedHashMap<String,int[]>();
 
-	//static JButton check=new JButton("Check");
-	JButton fold=new JButton("  Fold  ");
-	JButton raise=new JButton("Raise ");
-	JButton ready=new JButton("Ready");
-	JButton call=new JButton("Check");
-	static JLabel acounttable;
+	JButton fold;
+	JButton raise;
+	JButton ready;
+	JButton call;
+	JLabel acounttable;
 	JLabel main;
-	static int mainpot=0;
+	JPanel buttons;
+	int mainpot=0;
 	Game game;
 	public App(TCPClient TA,String a){
 		T=TA;
 		this.setResizable(false);
-		
+
 		setSize(1000,700);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,7 +63,11 @@ public class App extends JFrame {
 		game = new Game(this);
 		acounttable=new JLabel(""); 
 		main= new JLabel(Integer.toString(mainpot)); 
-		bnotallowed();
+		fold=new JButton("  Fold  ");
+		raise=new JButton("Raise ");
+		ready=new JButton("Ready");
+		call=new JButton("Check");
+		
 		chatfield= new JTextField();
 		chatfield.setColumns(20);
 		chatarea= new JTextArea(5,20);
@@ -72,11 +80,12 @@ public class App extends JFrame {
 		ChatReader chatreader=new ChatReader(this);
 		chatreader.start();
 		chatfield.addKeyListener(new KeyChatListener(this));
+		bnotallowed();
 
-
-		JPanel buttons= new JPanel();
+		buttons= new JPanel();
 		JPanel mid=new JPanel();
 		JPanel west=new JPanel();
+		JLabel copy=new JLabel("Copyright");
 		mid.setLayout(new BoxLayout(mid,BoxLayout.X_AXIS));
 		JLabel space[] =new JLabel[5];
 
@@ -84,13 +93,16 @@ public class App extends JFrame {
 			space[i] = new JLabel("  ");
 			space[i].setSize(200, 20);
 		}	
-		JLabel acountlabel= new JLabel("Your Acount:");
-		JLabel mainpotlabel= new JLabel("Main pot:");
-		acountlabel.setForeground(Color.yellow);
-		mainpotlabel.setForeground(Color.yellow);
+		neu=new Color(153, 5, 5);
+		gold=new Color(247,181,25);
+		acountlabel= new JLabel("Your Acount:");
+		mainpotlabel= new JLabel("Main pot:");
+		acountlabel.setForeground(gold);
+		mainpotlabel.setForeground(gold);
+		main.setForeground(gold);
+		acounttable.setForeground(gold);
 		acountlabel.setSize(66, 20);
 		buttons.setSize(66, 200);
-		Color neu=new Color(153, 5, 5);
 		buttons.setBackground(neu);
 		mid.add(Box.createHorizontalGlue());
 		mid.setBackground(neu);
@@ -159,7 +171,59 @@ public class App extends JFrame {
 			}
 
 		});
+	/*	addWindowListener(new WindowListener(){
 
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				JOptionPane opt = new JOptionPane("Are you sure?",JOptionPane.QUESTION_MESSAGE,JOptionPane.YES_NO_CANCEL_OPTION); 
+				int value = opt.showConfirmDialog(null, "Are youe sure?");
+				if (value == JOptionPane.YES_OPTION) {
+					
+					app.dispose();
+				}
+				if (value == JOptionPane.NO_OPTION) {
+				    opt.setVisible(false);
+				    return;
+				}  
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});*/
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx=0;
@@ -187,17 +251,23 @@ public class App extends JFrame {
 		c.gridy=0;
 		c.weightx=0.2;
 		add(mid,c);
-		
-		this.addWindowListener(new WindowAppListener (T));
-		raise.setBackground(Color.yellow);
+		c.gridx=1;
+		c.gridy=2;
+		add(copy,c);
+
+		//this.addWindowListener(new WindowAppListener (T));
+		raise.setBackground(gold);
 		raise.setForeground(Color.black);
 		raise.setOpaque(true);
-		fold.setBackground(Color.yellow);
+		fold.setBackground(gold);
 		fold.setForeground(Color.black);
 		fold.setOpaque(true);
-		call.setBackground(Color.yellow);
+		call.setBackground(gold);
 		call.setForeground(Color.black);
 		call.setOpaque(true);
+		ready.setBackground(gold);
+		ready.setForeground(Color.black);
+		ready.setOpaque(true);
 	}
 	public Game getGame(){
 		return game;

@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -66,7 +67,7 @@ public class registration extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if((!name.getText().equals("")) && (!word.getText().equals("")) && (name.getText().matches("\\A\\p{ASCII}*\\z"))) {
+				if(!name.getText().contains("-") && !name.getText().contains("$") && (!name.getText().equals("")) && (!word.getText().equals("")) && (name.getText().matches("\\A\\p{ASCII}*\\z"))) {
 					//name.setText("");
 					//world.setText("");
 
@@ -106,6 +107,54 @@ public class registration extends JFrame {
 					//word.setText("");
 				}
 			}
+		});
+		addWindowListener(new WindowListener(){
+
+			
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				authentikation.login.setEnabled(true);
+				authentikation.reg.setEnabled(true);
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
 		});
 		setSize(300,300);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);

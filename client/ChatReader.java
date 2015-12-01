@@ -3,6 +3,8 @@ package client;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Font;
+import java.rmi.activation.ActivateFailedException;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.html.HTML;
@@ -30,7 +32,7 @@ public class ChatReader extends Thread {
 					app.playersnum=(command.length-2)/2;
 					app.players.clear();
 					for(int i=2;i<command.length-2;i=i+4){
-						int playerint[]= new int[3];
+						int[] playerint= new int[3];
 						if(command[i].equals(app.name)) app.acounttable.setText(command[i+1]);
 						playerint[0]=Integer.parseInt(command[i+1]); // money
 						playerint[1]=Integer.parseInt(command[i+2]); // kartya1 
@@ -43,6 +45,8 @@ public class ChatReader extends Thread {
 				}
 				else if(command[1].equals("waitingforyou")){
 					app.ballowed();
+					java.awt.Toolkit.getDefaultToolkit().beep();
+
 				}
 				else if(command[1].equals("pot")){
 					app.main.setText(command[2]);
@@ -65,9 +69,14 @@ public class ChatReader extends Thread {
 					app.bnotallowed();
 					JOptionPane.showMessageDialog(null,"Congratulations to: "+command[2]+"\n"+"Prize:"+command[3],"End of game",JOptionPane.OK_OPTION,app.game.icon);
 					app.ready.setEnabled(true);
+					app.game.repaint(); 
 				}
 				else if (command[1].equals("dealer")){
 					app.game.dealerId=Integer.parseInt(command[2]);
+					app.game.repaint();
+				}
+				else if (command[1].equals("active")){
+					app.game.actualId=Integer.parseInt(command[2]);
 					app.game.repaint();
 				}
 			}

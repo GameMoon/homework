@@ -6,20 +6,16 @@ import java.security.NoSuchAlgorithmException;
 public class MD {
 	public static  String Mdhash(String text) throws UnsupportedEncodingException, NoSuchAlgorithmException{
 		byte[] premessage;
-
 		premessage = text.getBytes("UTF-8");
-	
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		md.update(premessage);
 		byte [] message= md.digest();
-		
 		StringBuffer hexString = new StringBuffer();
     	for (int i=0;i<message.length;i++) {
     		String hex=Integer.toHexString(0xff & message[i]);
    	     	if(hex.length()==1) hexString.append('0');
    	     	hexString.append(hex);
     	}
-    	//System.out.println(hexString.toString());
 		return hexString.toString();
 	}
 }
