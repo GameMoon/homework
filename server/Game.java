@@ -465,7 +465,7 @@ public class Game extends Thread {
         ArchiveGame agame = new ArchiveGame(this);
         FileOutputStream fileOut = null;
         try {
-            fileOut = new FileOutputStream("games/game" + System.currentTimeMillis() + ".bin");
+            fileOut = new FileOutputStream("games/game" + System.currentTimeMillis() + ".ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(agame);
             out.close();
@@ -476,7 +476,31 @@ public class Game extends Thread {
             e.printStackTrace();
         }
         currentState++;
-        System.out.println("game" + System.currentTimeMillis() + ".bin saved");
+        System.out.println("game" + System.currentTimeMillis() + ".ser saved");
+    }
+    public void loadGame(String name) {
+       ArchiveGame e = null;
+        try {
+            FileInputStream fileIn = new FileInputStream("games/game"+name+".ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            e = (ArchiveGame) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } catch (ClassNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        System.out.print("Flop: ");
+        for(int k = 0;k<5;k++){
+            System.out.print("["+flop[k].getId()+"] ");
+        }
+        System.out.println("");
+        for(Player p : e.players){
+            System.out.println("Player: "+p.getName()+"Card: ["+p.getCard(0).getId()+"]["+p.getCard(0).getId()+"]");
+        }
     }
     public void blind(){
         smallblindid = dealerid + 1;

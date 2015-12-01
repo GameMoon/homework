@@ -20,6 +20,7 @@ public class GameManager extends Thread {
         start();
         System.out.println("GameManager started");
     }
+    public TableManager getTableManager(){ return tableManager;}
     public TCPServer getTCPServer(){return tcpServer;}
     public DataBase getDataBase(){ return dataBase;}
     public void run() {

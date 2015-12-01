@@ -54,6 +54,10 @@ public class CommandListener extends Thread {
                 System.out.println(gameManager.getDataBase().getMoney(cmd[1]));
             } else if(cmd[0].equals("logintest")) {
                 System.out.println(gameManager.getDataBase().checkCredentials(cmd[1],cmd[2]));
+            } else if(cmd[0].equals("savetable")) {
+               gameManager.getTableManager().getTable(Integer.parseInt(cmd[1])).getGame().saveGame();
+            } else if(cmd[0].equals("loadtable")) {
+                gameManager.getTableManager().getTable(0).getGame().loadGame(cmd[1]);
             }
             else{
                 System.out.println("Unknown command");
