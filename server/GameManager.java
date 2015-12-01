@@ -38,7 +38,6 @@ public class GameManager extends Thread {
             String[] command = commands.get(socket).split("-");
             if (command[0].equals("$") && command[command.length - 1].equals("$")) {
                 if (command[1].equals("verify")) {
-                    System.out.println(command[2]+","+command[3]);
                     boolean isOK = true;
                     for(Player p : players) if(p.getName().equals(command[2])) isOK = false;
                     if(dataBase.checkCredentials(command[2],command[3]) && isOK){  tcpServer.sendCommand(socket,"$-ok-$");}
@@ -51,6 +50,8 @@ public class GameManager extends Thread {
                     try{ Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
                          dataBase.setMoney(currentPlayer.getName(),currentPlayer.getMoney());
                          players.remove(currentPlayer);
+                         tableManager.getTable(currentPlayer.getTableId()).getGame().players.remove(currentPlayer);
+                         tableManager.getTable(currentPlayer.getTableId()).getGame().refreshPlayerData();
                     }
                     catch (NoSuchElementException e){}
                     usedCommands.add(socket);
@@ -71,20 +72,25 @@ public class GameManager extends Thread {
                     usedCommands.add(socket);
                 } else if(command[1].equals("ready")){
                     Player sender = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
-                    if(sender.isReady()) sender.setReady(false);
-                    else sender.setReady(true);
-                    System.out.println(sender.getName()+" is ready");
+                    if(!tableManager.getTable(sender.getTableId()).getGame().isRunning()) {
+                           if (sender.isReady()) sender.setReady(false);
+                           else sender.setReady(true);
+                           System.out.println(sender.getName() + " is ready");
+                    }
                     usedCommands.add(socket);
                 } else if(command[1].equals("raise")){
                     Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
                     currentPlayer.setAction(Player.Action.RAISE);
-                    currentPlayer.setRaiseAmmount(Integer.parseInt(command[2]));
+                    currentPlayer.setRaiseing(Integer.parseInt(command[2]));
+                    usedCommands.add(socket);
                 } else if(command[1].equals("call")){
                     Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
                     currentPlayer.setAction(Player.Action.CALL);
+                    usedCommands.add(socket);
                 } else if(command[1].equals("fold")){
                     Player currentPlayer  = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
                     currentPlayer.setAction(Player.Action.FOLD);
+                    usedCommands.add(socket);
                 }
 
             }
@@ -103,15 +109,22 @@ public class GameManager extends Thread {
     public void Stop() {
         running = false;
     }
+
     public void newPlayer(String name,String password,Socket socket){
         int tableid = 0;
         while(tableManager.getTable(tableid).isFull()) tableid++;
         Player newPlayer = new Player(name, password, dataBase.getMoney(name), socket);
         newPlayer.setTableId(tableid);
-        tableManager.getTable(tableid).addPlayer(newPlayer);
-        if (!players.contains(newPlayer)) players.add(newPlayer);
+        if (!players.contains(newPlayer)){
+            players.add(newPlayer);
+            tableManager.getTable(tableid).getGame().players.add(newPlayer);
+        }
         tcpServer.sendCommand(socket,"$-info-"+newPlayer.getName()+"-"+newPlayer.getMoney()+"-$");
-        tableManager.getTable(tableid).getGame().sendPlayerInfo(socket);
+        tcpServer.sendCommand(socket,"$-chat-[Server]-Welcome_"+newPlayer.getName()+"!-$");
+        for(Player p : players){
+         tableManager.getTable(tableid).getGame().sendPlayerInfo(p.getSocket());
+        }
+
         sendMessage("Connected: " + name + " password: " + password);
     }
 }

@@ -51,8 +51,11 @@ public class TCPServer extends Thread {
         try {
             DataOutputStream dataout = new DataOutputStream(client.getOutputStream());
             dataout.writeBytes(data + '\n');
+            Thread.sleep(Constants.delay);
         } catch (IOException e) {
             System.err.println("Failed to send command");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
     public Map<Socket, String> getCommands() {

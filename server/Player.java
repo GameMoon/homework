@@ -1,9 +1,10 @@
 package server;
 
+import java.io.Serializable;
 import java.net.Socket;
 
 
-public class Player {
+public class Player implements Serializable{
     public enum Action {CALL,FOLD,RAISE,NONE}
     private final String name;
     private final String password;
@@ -15,6 +16,7 @@ public class Player {
     private Card[] cards;
     private Action action;
     private int raiseAmmount;
+    private int raiseing;
 
     public Player(String name,String password,int money,Socket socket){
         this.name = name;
@@ -26,6 +28,7 @@ public class Player {
         setCard(1,new Card(53));
         this.socket = socket;
         action = Action.NONE;
+        raiseing = 0;
         raiseAmmount = 0;
     }
     public Socket getSocket(){ return socket;}
@@ -67,4 +70,6 @@ public class Player {
     }
     public void setRaiseAmmount(int ammount){ raiseAmmount = ammount;}
     public int getRaiseAmmount(){ return raiseAmmount;}
+    public int getRaiseing(){return  raiseing;}
+    public void setRaiseing(int ammount){raiseing = ammount;}
 }

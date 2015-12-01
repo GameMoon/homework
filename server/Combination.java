@@ -15,59 +15,99 @@ public class Combination {
         cards.add(player.getCard(0));
         cards.add(player.getCard(1));
         for (int k = 0; k < 5; k++) cards.add(flop[k]);
-        value = calculate();
     }
 
     public int getValue() {
-        return value;
+        return calculate();
     }
-
+    public static String getName(int index){
+        if(index == 82341) return "Royalflush";
+        else if(index == 82340) return "StraightFlush";
+        else if(index == 82339) return "Poker";
+        else if(index == 82338) return "FullHouse";
+        else if(index == 82337) return "Flush";
+        else if(index == 82336) return "Straight";
+        else if(index>5881 && index <= 82335) return "Drill";
+        else if(index <= 5881 && index > 210) return "TwoPair";
+        else if(index >=15 && index <= 210) return "Pair";
+        else return "HighCard";
+     }
     private int calculate() {
         int value = 0;
-        if (isRoyalFlush(cards)) return 22;
-        if (isStraightFlush(cards)) return 21;
-        if (isPoker(cards)) return 20;
-        if (isFullHouse(cards)) return 19;
-        if (isFlush(cards)) return 18;
-        if (isStraight(cards)) return 17;
-        if (isDrill(cards)) return 16;
-        if (isTwoPair(cards)) return 15;
-        if (isPair(cards)) return 14;
-        if (player.getCard(0).getValue() > player.getCard(1).getValue()) return player.getCard(0).getValue();
-        else return player.getCard(1).getValue();
-    }
-
-    private boolean isPair(ArrayList<Card> cards) {
-        for (Card card1 : cards) {
-            for (Card card2 : cards) {
-                if (card1 != card2 && card1.getValue() == card2.getValue()) return true;
-            }
+        int multiplier = 1;
+        if (isRoyalFlush(cards)) return 82341;
+        else if (isStraightFlush(cards)) return 82340;
+        else if (isPoker(cards)) return 82339;
+        else if (isFullHouse(cards)) return 82338;
+        else if (isFlush(cards)) return 82337;
+        else if (isStraight(cards)) return 82336;
+        else if (isDrill(cards) > 0){
+            return 5881*isDrill(cards);
         }
-        return false;
-    }
-
-    private boolean isTwoPair(ArrayList<Card> cards) {
-        int numberOfPair = 0;
-        for (Card card1 : cards) {
-            for (Card card2 : cards) {
-                if (card1 != card2 && card1.getValue() == card2.getValue()) numberOfPair++;
-                if (numberOfPair == 2) return true;
-            }
+        else if (isTwoPair(cards) > 0){
+            return 210*isTwoPair(cards);
         }
-        return false;
+        else if (isPair(cards) > 0){
+            return 15*isPair(cards);
+        }
+        else {
+            if(player.getCard(0).getValue() == 1 || player.getCard(1).getValue() == 1) return 14;
+            if(player.getCard(0).getValue() > player.getCard(1).getValue())
+                return player.getCard(0).getValue();
+            else return player.getCard(1).getValue();
+        }
+
     }
 
-    private boolean isDrill(ArrayList<Card> cards) {
-        for (Card card1 : cards) {
-            for (Card card2 : cards) {
-                for (Card card3 : cards) {
-                    if (card1 != card2 && card1 != card3 && card2 != card3 &&
-                            card1.getValue() == card2.getValue() && card1.getValue() == card3.getValue())
-                        return true;
+    private int isPair(ArrayList<Card> cards) {
+        for(Card card1 : cards){
+            for(Card card2 :cards){
+                if(card1 != card2 &&card1.getValue()==card2.getValue()){
+                    if(card1.getValue() == 1) return 14;
+                    else return card1.getValue();
                 }
             }
         }
-        return false;
+        return 0;
+    }//pair
+
+    private int isTwoPair(ArrayList<Card> cards) {
+        int value = 0;
+        for(Card card1 : cards){
+            for(Card card2 :cards){
+                if(card1 != card2 && card1.getValue()==card2.getValue()){
+                    if(card1.getValue() == 1) value += 14;
+                    else value += card1.getValue();
+
+                    ArrayList<Card> tempCards = new ArrayList<>();
+                    tempCards.addAll(cards);
+                    tempCards.remove(card1);
+                    tempCards.remove(card2);
+                    if(isPair(tempCards) > 0){
+                        value += isPair(tempCards);
+                        return value;
+                    }
+                }
+
+            }
+
+        }
+        return 0;
+    }//twopair
+
+    private int isDrill(ArrayList<Card> cards) {
+        for(Card card1 : cards){
+            for(Card card2 : cards){
+                for(Card card3: cards){
+                    if(card1 != card2 && card1 != card3 && card2 != card3 &&
+                            card1.getValue() == card2.getValue() && card1.getValue() == card3.getValue()) {
+                        if (card1.getValue() == 1) return 14;
+                        else return card1.getValue();
+                    }
+                }
+            }
+        }
+        return 0;
     }
 
     private boolean isStraight(ArrayList<Card> cards) {
@@ -102,12 +142,15 @@ public class Combination {
     }
 
     private boolean isFullHouse(ArrayList<Card> cards) {
+        ArrayList<Card> tempcards = new ArrayList<>();
         for (Card card1 : cards) {
             for (Card card2 : cards) {
                 if (card1 != card2 && card1.getValue() == card2.getValue()) {
-                    cards.remove(card1);
-                    cards.remove(card2);
-                    if (isDrill(cards)) return true;
+                    tempcards.clear();
+                    tempcards.addAll(cards);
+                    tempcards.remove(card1);
+                    tempcards.remove(card2);
+                    if (isDrill(tempcards) > 0) return true;
                 }
             }
         }
