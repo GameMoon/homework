@@ -3,6 +3,10 @@ package server;
 import java.net.Socket;
 import java.util.*;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import java.util.concurrent.CopyOnWriteArrayList;
+>>>>>>> server
 =======
 import java.util.concurrent.CopyOnWriteArrayList;
 >>>>>>> server
@@ -43,6 +47,7 @@ public class GameManager extends Thread {
             if (command[0].equals("$") && command[command.length - 1].equals("$")) {
                 if (command[1].equals("verify")) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                     if(command[2].equals("asd")){
                         tcpServer.sendCommand(socket,"$-ok-$");
                         System.out.println("belpett");
@@ -74,6 +79,8 @@ public class GameManager extends Thread {
                     usedCommands.add(socket);
                 }
 =======
+=======
+>>>>>>> server
                     boolean isOK = true;
                     for(Player p : players) if(p.getName().equals(command[2])) isOK = false;
                     if(dataBase.checkCredentials(command[2],command[3]) && isOK){  tcpServer.sendCommand(socket,"$-ok-$");}
@@ -129,6 +136,9 @@ public class GameManager extends Thread {
                     usedCommands.add(socket);
                 }
 
+<<<<<<< HEAD
+>>>>>>> server
+=======
 >>>>>>> server
             }
         });
