@@ -69,11 +69,12 @@ public class Game extends Thread {
 
     public void waitingForPlayers() {
         int readyPlayers = 0;
+        if(players.isEmpty()) return;
         for (Player currentPlayer : players) {
             if (currentPlayer.isReady() && currentPlayer.getMoney() >= bigBlind) readyPlayers++;
         }
         if (readyPlayers == players.size() && players.size() > 1) currentState++;
-        if (players.size() == 0) {
+        if (players.size() < 2) {
             dealerid = 0;
             pot = 0;
         }
@@ -118,7 +119,7 @@ public class Game extends Thread {
         for (Player p : players) {
             command += p.getName() + "-" + p.getMoney() + "-";
             if (p.getSocket() == socket)
-                command +=  p.getCard(0).getId() + "-" + p.getCard(1).getId() + "-";
+                command += p.getCard(0).getId() + "-" + p.getCard(1).getId() + "-";
             else {
                 if (p.getCard(0).getId() != 53 && p.getCard(0).getId() != 53)
                     command += "52-52-";
@@ -144,95 +145,27 @@ public class Game extends Thread {
         }
     }
 
-    public int waitingforPlayerAction(int k, int round, boolean blind) {
+    public int waitingForPlayerAction(int k, int round, boolean blind) {
         try {
+            boolean exit = false;
             if (players.get(k).isReady()) {
                 tcpServer.sendCommand(players.get(k).getSocket(), "$-waitingforyou-$"); //Waiting for player action
 
-                while (players.get(k).getAction() == Player.Action.NONE) ;
-                if(raiseAmmount>0 && players.get(k).getAction() == Player.Action.RAISE) players.get(k).setAction(Player.Action.CALL);
-                if (players.get(k).getAction() == Player.Action.RAISE) { //RAISE
-
-                    if(blind && k != bigblindid){
-                        if(smallblindid == k){
-                            if (players.get(k).getRaiseing() + raiseAmmount+smallBlind <= players.get(k).getMoney()) {
-                                raiseAmmount += players.get(k).getRaiseing();
-                                int money = raiseAmmount - players.get(k).getRaiseAmmount()+smallBlind;
-                                players.get(k).setMoney(players.get(k).getMoney() - money);
-                                pot += money;
-                                players.get(k).setRaiseAmmount(raiseAmmount);
-                            }
-                        }
-                        else{
-                            if (players.get(k).getRaiseing() + raiseAmmount+bigBlind <= players.get(k).getMoney()) {
-                                raiseAmmount += players.get(k).getRaiseing();
-                                int money = raiseAmmount - players.get(k).getRaiseAmmount()+bigBlind;
-                                players.get(k).setMoney(players.get(k).getMoney() - money);
-                                pot += money;
-                                players.get(k).setRaiseAmmount(raiseAmmount);
-                            }
-                        }
-                    }
-                    else {
-                            raiseAmmount += players.get(k).getRaiseing();
-                            int money = raiseAmmount - players.get(k).getRaiseAmmount();
-                            players.get(k).setMoney(players.get(k).getMoney() - money);
-                            pot += money;
-                            players.get(k).setRaiseAmmount(raiseAmmount);
-                    }
-                    sendMessageAll(players.get(k).getName() + " raised with "+ players.get(k).getRaiseing());
-                    players.get(k).setRaiseing(0);
-                    players.get(k).setAction(Player.Action.NONE);
-                } else if (players.get(k).getAction() == Player.Action.FOLD) { //FOLD
-                    players.get(k).getCard(0).setId(53);
-                    players.get(k).getCard(1).setId(53);
-                    players.get(k).setReady(false);
-                    players.get(k).setAction(Player.Action.NONE);
-                    sendMessageAll(players.get(k).getName() + " folded");
-                } else if (players.get(k).getAction() == Player.Action.CALL) { //CALL
-                    if(blind){
-                        if(k == bigblindid){
-                            if(raiseAmmount > 0){
-                                players.get(k).setMoney(players.get(k).getMoney()-raiseAmmount);
-                                pot+=raiseAmmount;
-                                players.get(k).setRaiseAmmount(raiseAmmount);
-                            }
-                        }
-                        else if(k == smallblindid){
-                            if(raiseAmmount > 0){
-                                players.get(k).setMoney(players.get(k).getMoney()-raiseAmmount-smallBlind);
-                                pot+=raiseAmmount+smallBlind;
-                                players.get(k).setRaiseAmmount(raiseAmmount);
-                            }
-                            else{
-                                players.get(k).setMoney(players.get(k).getMoney()-smallBlind);
-                                pot+=smallBlind;
-                            }
-                        }
-                        else{
-                            if(raiseAmmount > 0){
-                                players.get(k).setMoney(players.get(k).getMoney()-raiseAmmount-bigBlind);
-                                pot+=raiseAmmount+bigBlind;
-                                players.get(k).setRaiseAmmount(raiseAmmount);
-                            }
-                            else{
-                                players.get(k).setMoney(players.get(k).getMoney()-bigBlind);
-                                pot+=bigBlind;
-                            }
-                        }
-                    }
-                    else{
-                        if(raiseAmmount > 0){
-                            players.get(k).setMoney(players.get(k).getMoney()-raiseAmmount);
-                            pot+=raiseAmmount;
-                            players.get(k).setRaiseAmmount(raiseAmmount);
-                        }
-                    }
-                    if(raiseAmmount >0) sendMessageAll(players.get(k).getName() + " called");
-                    else sendMessageAll(players.get(k).getName() + " checked");
-                    players.get(k).setAction(Player.Action.NONE);
+                while(players.get(k).getAction() == Player.Action.NONE);
+                if(players.get(k).getAction() == Player.Action.RAISE && round>0){
+                    players.get(k).setAction(Player.Action.CALL);
                 }
+                if (players.get(k).getAction() == Player.Action.RAISE) { //RAISE
+                    raise(k, round, blind);
+                } else if (players.get(k).getAction() == Player.Action.FOLD) { //FOLD
+                    fold(k, round, blind);
+                } else if (players.get(k).getAction() == Player.Action.CALL) { //CALL
+                    call(k, round, blind);
+                    exit = true;
+                }
+                players.get(k).setAction(Player.Action.NONE);
                 refreshPlayerData();
+                if(round > 0 && exit) return -1;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("kilepett" + (k - 1));
@@ -253,31 +186,25 @@ public class Game extends Thread {
         System.out.println("Table[" + tableid + "]: " + text);
     }
 
-    private void waitingforActions(boolean blind) {
-        int startindex = dealerid + 1;
-        if (startindex == players.size()) startindex = 0;
-        if(players.size() == 0){
+    private void waitingForAction(boolean blind) {
+        int startindex = smallblindid;
+        if (players.size() == 0) {
             dealerid = 0;
             currentState = -1;
             return;
         }
         raiseAmmount = 0;
-        for(Player p : players){
-            p.setRaiseAmmount(0);
-        }
+        for (Player p : players)  p.setRaiseAmmount(0);
         int round = 0;
-        boolean enable = true;
         loop:
-        while (enable) {
+        while (true) {
             for (int k = startindex; k < players.size(); k++) {
                 if (players.get(k).isReady()) {
-                    if (round == 1 && k == startindex && raiseAmmount == 0) {
-                        break loop;
-                    }
                     for (Player p : players) {
                         tcpServer.sendCommand(p.getSocket(), "$-active-" + k + "-$");
                     }
-                    k = waitingforPlayerAction(k, round, blind);
+                    k = waitingForPlayerAction(k, round, blind);
+                    if(k == -1) break loop;
                 }
                 if (checkFoldWin()) {
                     break loop;
@@ -288,7 +215,7 @@ public class Game extends Thread {
                     for (Player p : players) {
                         tcpServer.sendCommand(p.getSocket(), "$-active-" + k + "-$");
                     }
-                    k = waitingforPlayerAction(k, round, blind);
+                    k = waitingForPlayerAction(k, round, blind);
                 }
                 if (checkFoldWin()) {
                     break loop;
@@ -302,6 +229,7 @@ public class Game extends Thread {
             }
             if (numberofraisedpeople == numberofactiveplayers) break loop;
             round++;
+            blind = false;
         }
         currentState++;
     }
@@ -334,6 +262,7 @@ public class Game extends Thread {
             tcpServer.sendCommand(p.getSocket(), "$-dealer-" + dealerid + "-$");
         }
         currentState = -1;
+        System.out.println("Game End");
     }
 
     public boolean checkFoldWin() {
@@ -353,7 +282,6 @@ public class Game extends Thread {
     public void run() {
         super.run();
         while (isRunning) {
-
             if (currentState == -1) { //Reset parameters
                 waitingForPlayers();
             } else if (currentState == 0) {  //Waiting for players
@@ -369,21 +297,21 @@ public class Game extends Thread {
             } else if (currentState == 1) { //Generating cars
                 generateCards();
             } else if (currentState == 2) {
-                 blind();
+                blind();
             } else if (currentState == 3) { //Blind raise,fold or check
-                waitingforActions(true);
+                waitingForAction(true);
             } else if (currentState == 4) { //Flop
                 sendFlop();
             } else if (currentState == 5) {
-                waitingforActions(false);
+                waitingForAction(false);
             } else if (currentState == 6) { //Turn
                 sendTurn();
             } else if (currentState == 7) {
-                waitingforActions(false);
+                waitingForAction(false);
             } else if (currentState == 8) { //River
                 sendRiver();
             } else if (currentState == 9) {
-                waitingforActions(false);
+                waitingForAction(false);
             } else if (currentState == 10) {
                 getWinner();
             } else if (currentState == 11) {
@@ -398,10 +326,10 @@ public class Game extends Thread {
         Player winner = null;
         int winnerValue = 0;
         int activePlayers = 0;
-        for(Player p: players){
-            if(p.isReady()) activePlayers++;
+        for (Player p : players) {
+            if (p.isReady()) activePlayers++;
         }
-        if(activePlayers == 1) {
+        if (activePlayers == 1) {
             for (Player p : players) {
                 winner = p;
             }
@@ -411,8 +339,7 @@ public class Game extends Thread {
             }
             pot = 0;
             refreshPlayerData();
-        }
-        else{
+        } else {
             for (Player p : players) {
                 if (p.getCard(0).getId() != 53 && p.isReady()) {
                     Combination combo = new Combination(p, flop);
@@ -435,11 +362,11 @@ public class Game extends Thread {
                             winners.clear();
                             winners.add(p);
                         } else {
-                            if(!winners.contains(winner))
-                            winners.add(winner);
+                            if (!winners.contains(winner))
+                                winners.add(winner);
                         }
                     } else {
-                        if(!winners.contains(p)) winners.add(p);
+                        if (!winners.contains(p)) winners.add(p);
                     }
                 }
             }
@@ -450,7 +377,21 @@ public class Game extends Thread {
             for (Player p : players) {
                 for (Player w : winners) {
                     tcpServer.sendCommand(p.getSocket(), "$-winner-" + w.getName() + "-" + pot / winners.size() + "-$");
-                    tcpServer.sendCommand(p.getSocket(), "$-chat-[Server]-The_winner_is_" + w.getName() + "_with_" + Combination.getName(winnerValue) + "!-$");
+                    String hand="";
+                    if(w.getCard(0).getValue()==11)hand+="J";
+                    else if(w.getCard(0).getValue()==12)hand+="Q";
+                    else if(w.getCard(0).getValue()==13)hand+="K";
+                    else if(w.getCard(0).getValue()==1)hand+="A";
+                    else hand += w.getCard(0).getValue();
+
+                    if(w.getCard(1).getValue()==11)hand+="J";
+                    else if(w.getCard(1).getValue()==12)hand+="Q";
+                    else if(w.getCard(1).getValue()==13)hand+="K";
+                    else if(w.getCard(1).getValue()==1)hand+="A";
+                    else hand += w.getCard(1).getValue();
+
+                    tcpServer.sendCommand(p.getSocket(), "$-chat-[Server]-The_winner_is_" + w.getName() + "_with_" + Combination.getName(winnerValue) + "+"+hand+"!-$");
+                    System.out.println("Winner is" + w.getName());
                 }
             }
             pot = 0;
@@ -478,10 +419,11 @@ public class Game extends Thread {
         currentState++;
         System.out.println("game" + System.currentTimeMillis() + ".ser saved");
     }
+
     public void loadGame(String name) {
-       ArchiveGame e = null;
+        ArchiveGame e = null;
         try {
-            FileInputStream fileIn = new FileInputStream("games/game"+name+".ser");
+            FileInputStream fileIn = new FileInputStream("games/game" + name + ".ser");
             ObjectInputStream in = new ObjectInputStream(fileIn);
             e = (ArchiveGame) in.readObject();
             in.close();
@@ -494,26 +436,95 @@ public class Game extends Thread {
             e1.printStackTrace();
         }
         System.out.print("Flop: ");
-        for(int k = 0;k<5;k++){
-            System.out.print("["+flop[k].getId()+"] ");
+        for (int k = 0; k < 5; k++) {
+            System.out.print("[" + flop[k].getId() + "] ");
         }
         System.out.println("");
-        for(Player p : e.players){
-            System.out.println("Player: "+p.getName()+"Card: ["+p.getCard(0).getId()+"]["+p.getCard(0).getId()+"]");
+        for (Player p : e.players) {
+            System.out.println("Player: " + p.getName() + "Card: [" + p.getCard(0).getId() + "][" + p.getCard(0).getId() + "]");
         }
     }
-    public void blind(){
+
+    public void blind() {
         smallblindid = dealerid + 1;
         if (smallblindid == players.size()) smallblindid = 0;
         bigblindid = smallblindid + 1;
         if (bigblindid == players.size()) bigblindid = 0;
-        System.out.println("Bigblind: "+players.get(bigblindid).getName());
-        System.out.println("Smallblind: "+players.get(smallblindid).getName());
+        sendMessageAll("Bigblind: " + players.get(bigblindid).getName());
+        sendMessageAll("Smallblind: " + players.get(smallblindid).getName());
         players.get(smallblindid).setMoney(players.get(smallblindid).getMoney() - 10);
         players.get(bigblindid).setMoney(players.get(bigblindid).getMoney() - 20);
         pot += 10;
         pot += 20;
         refreshPlayerData();
         currentState++;
+    }
+
+    public void raise(int k, int round, boolean blind) {
+        synchronized (players) {
+            int money = 0;
+            System.out.println("----------");
+            if (blind && k != bigblindid) {
+                if (smallblindid == k) {
+                    money = smallBlind + players.get(k).getRaiseing() + raiseAmmount - players.get(k).getRaiseAmmount();
+                    System.out.println("a");
+                } else {
+                    money = bigBlind + players.get(k).getRaiseing() + raiseAmmount - players.get(k).getRaiseAmmount();
+                    System.out.println("b");
+                }
+            } else {
+                money = players.get(k).getRaiseing() + raiseAmmount - players.get(k).getRaiseAmmount();
+                System.out.println("c");
+            }
+            //Debug-----
+
+            System.out.println("Emelt " + players.get(k).getName());
+            System.out.println("Params: " + players.get(k).getRaiseing() + "|" + raiseAmmount + "|" + players.get(k).getRaiseAmmount());
+            System.out.println("Money: " + money);
+
+            //-----
+            if (addMoneyToPot(players.get(k), money)) {
+                raiseAmmount += players.get(k).getRaiseing();
+                players.get(k).setRaiseAmmount(raiseAmmount);
+            }
+            sendMessageAll(players.get(k).getName() + " raised with " + players.get(k).getRaiseing());
+            players.get(k).setRaiseing(0);
+        }
+    }
+
+    public boolean addMoneyToPot(Player p, int ammount) {
+        if (p.getMoney() >= ammount) {
+            pot += ammount;
+            p.setMoney(p.getMoney() - ammount);
+            return true;
+        } else return false;
+    }
+
+    public void call(int k, int round, boolean blind) {
+        int money = 0;
+        if (blind) {
+            if (k == bigblindid) {
+                money = raiseAmmount - players.get(k).getRaiseAmmount();
+            } else if (k == smallblindid) {
+                money = raiseAmmount + smallBlind - players.get(k).getRaiseAmmount();
+            } else {
+                money = raiseAmmount + bigBlind - players.get(k).getRaiseAmmount();
+            }
+        } else {
+            money = raiseAmmount - players.get(k).getRaiseAmmount();
+        }
+        if (addMoneyToPot(players.get(k), money)) {
+            players.get(k).setRaiseAmmount(raiseAmmount);
+        }
+
+        if (raiseAmmount > 0) sendMessageAll(players.get(k).getName() + " called");
+        else sendMessageAll(players.get(k).getName() + " checked");
+    }
+
+    public void fold(int k, int round, boolean blind) {
+        players.get(k).getCard(0).setId(53);
+        players.get(k).getCard(1).setId(53);
+        players.get(k).setReady(false);
+        sendMessageAll(players.get(k).getName() + " folded");
     }
 }
