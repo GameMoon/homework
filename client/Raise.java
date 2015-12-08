@@ -13,11 +13,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class Raise extends JFrame {
-TCPClient T;
-JTextField money;
-App app;
-JButton raisebutton;
-JLabel acount;
+	TCPClient T;
+	JTextField money;
+	App app;
+	JButton raisebutton;
+	JLabel acount;
 	public Raise(TCPClient t,App b) {
 		app=b;
 		T=t;
@@ -45,35 +45,35 @@ JLabel acount;
 					JOptionPane.showMessageDialog(null,"INCORRECT RAISE", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
-			
+
 		});
-		
+
 		money.getDocument().addDocumentListener(new DocumentListener(){
-						@Override
+			@Override
 			public void changedUpdate(DocumentEvent arg0) {
 				if(!money.getText().equals("") && Integer.parseInt(money.getText())>0 && digit(money.getText())==true && Integer.parseInt(money.getText())<=Integer.parseInt(app.acounttable.getText())){
-				acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
+					acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
 				}
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {
 				if(!money.getText().equals("") && Integer.parseInt(money.getText())>0 && digit(money.getText())==true && Integer.parseInt(money.getText())<=Integer.parseInt(app.acounttable.getText())){
-				acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
+					acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
 				}
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
 				if(!money.getText().equals("") && Integer.parseInt(money.getText())>0 && digit(money.getText())==true && Integer.parseInt(money.getText())<=Integer.parseInt(app.acounttable.getText())){
-				acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
+					acount.setText("Your acount: "+ Integer.toString(Integer.parseInt(app.acounttable.getText())-Integer.parseInt(money.getText())));
 				}
 			}
-			
+
 		});
-		
+
 		acount.setFont(new Font(null, Font.PLAIN, 16));
-		
+
 		add(acount,BorderLayout.NORTH);
 		add(money);
 		add(raisebutton,BorderLayout.SOUTH);
@@ -83,19 +83,20 @@ JLabel acount;
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
-public static boolean digit(String a){
-	int nummer=0;
-	char isnummer[]=a.toCharArray();
-	for(int i=0;i<isnummer.length;i++){
-		
-		if((isnummer[i]<='9') && (isnummer[i]>='0')){
-			nummer++;
+	//entscheidet ob nummer oder nicht
+	public static boolean digit(String a){
+		int nummer=0;
+		char isnummer[]=a.toCharArray();
+		for(int i=0;i<isnummer.length;i++){
+
+			if((isnummer[i]<='9') && (isnummer[i]>='0')){
+				nummer++;
+			}
+			else return false;
+		}
+		if(nummer==a.length()){
+			return true;
 		}
 		else return false;
 	}
-	if(nummer==a.length()){
-	return true;
-	}
-	else return false;
-}
 }

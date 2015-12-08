@@ -27,6 +27,7 @@ import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 
 public class App extends JFrame {
+	int raisecount=0;
 	App app=this;
 	public TCPClient T;
 	int one=53;
@@ -58,7 +59,7 @@ public class App extends JFrame {
 
 		setSize(1000,700);
 		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setTitle("Poker-"+a);
 		game = new Game(this);
 		acounttable=new JLabel(""); 
@@ -66,8 +67,9 @@ public class App extends JFrame {
 		fold=new JButton("  Fold  ");
 		raise=new JButton("Raise ");
 		ready=new JButton("Ready");
+		ready.setFont(new Font(null, Font.PLAIN, 25));
 		call=new JButton("Check");
-		
+
 		chatfield= new JTextField();
 		chatfield.setColumns(20);
 		chatarea= new JTextArea(5,20);
@@ -153,6 +155,7 @@ public class App extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				Raise raisepanel= new Raise(T,app);
+				raisecount++;
 
 			}
 
@@ -171,59 +174,61 @@ public class App extends JFrame {
 			}
 
 		});
-	/*	addWindowListener(new WindowListener(){
+		addWindowListener(new WindowListener(){
 
 			@Override
 			public void windowActivated(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void windowClosed(WindowEvent arg0) {
-				
-				
+
+
 			}
 
 			@Override
 			public void windowClosing(WindowEvent arg0) {
 				JOptionPane opt = new JOptionPane("Are you sure?",JOptionPane.QUESTION_MESSAGE,JOptionPane.YES_NO_CANCEL_OPTION); 
-				int value = opt.showConfirmDialog(null, "Are youe sure?");
+				int value = opt.showConfirmDialog(null, "Are you sure?");
 				if (value == JOptionPane.YES_OPTION) {
+					System.exit(0);
 					
-					app.dispose();
 				}
 				if (value == JOptionPane.NO_OPTION) {
-				    opt.setVisible(false);
-				    return;
+					opt.setVisible(false);
+					System.out.println("dfd");
+					return;
+
 				}  
 			}
 
 			@Override
 			public void windowDeactivated(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void windowDeiconified(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void windowIconified(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
-		});*/
+
+		});
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx=0;

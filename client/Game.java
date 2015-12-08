@@ -136,13 +136,13 @@ public class Game extends JPanel{
 	}
 	public void dealerprint(int a,Graphics g){
 		if(splitkoord[a][1]>=200 && 650!=splitkoord[a][0]){
-			g.drawImage(dealerimagemin, splitkoord[a][0]+100,splitkoord[a][1] , this);
+			g.drawImage(dealerimagemin, splitkoord[a][0]+70,splitkoord[a][1] , this);
 			if(splitkoord[a][0]==650){
 				g.drawImage(dealerimagemin, splitkoord[a][0]-70,splitkoord[a][1] , this);
 			}
 		}
 		else {
-			g.drawImage(dealerimagemin, splitkoord[a][0],splitkoord[a][1]+70 , this);
+			g.drawImage(dealerimagemin, splitkoord[a][0],splitkoord[a][1]+80 , this);
 
 		}
 	}
