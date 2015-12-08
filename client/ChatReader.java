@@ -14,7 +14,10 @@ public class ChatReader extends Thread {
 	public ChatReader(App a) {
 		app=a;
 	}
-	public void run() {
+	public synchronized void wakeup(){
+		notify();
+	}
+	public synchronized void run() {
 		while(app.T.isAlive()){
 			String[] command = app.T.getCommand().split("-");
 			if (command[0].equals("$") && command[command.length - 1].equals("$")) {
@@ -47,7 +50,7 @@ public class ChatReader extends Thread {
 				}
 				else if(command[1].equals("waitingforyou")){
 					app.ballowed();
-					if(app.raisecount==1 || app.players.get(app.name)[0]==0){   // elvileg nullánál nem lehet emelni
+					if(app.raisecount==1 || app.players.get(app.name)[0]==0){   // elvileg nullï¿½nï¿½l nem lehet emelni
 						app.raise.setEnabled(false);
 					}
 					java.awt.Toolkit.getDefaultToolkit().beep();
@@ -89,7 +92,11 @@ public class ChatReader extends Thread {
 					app.game.repaint();
 				}
 			}
-
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

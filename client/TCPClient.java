@@ -16,6 +16,7 @@ public class TCPClient extends Thread {
 	private Socket socket;
 	private boolean running;
 	private CopyOnWriteArrayList incomingCommands;
+	private App app = null;
 
 	public TCPClient(String ip, int port) {
 		running = true;
@@ -29,7 +30,9 @@ public class TCPClient extends Thread {
 			System.err.println("Can't open that Socket (" + ip + ":" + port + ")");
 		}
 	}
-
+	public void setApp(App app){
+		this.app = app;
+	}
 	public void Stop() {
 		running = false;
 	}
@@ -43,6 +46,7 @@ public class TCPClient extends Thread {
 					System.out.println(command);
 					if (command.equals("closed")) Stop();
 					incomingCommands.add(command);
+					if(app != null) app.chatreader.wakeup();
 				}
 			}
 			socket.close();

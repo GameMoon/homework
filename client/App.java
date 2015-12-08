@@ -53,8 +53,12 @@ public class App extends JFrame {
 	JPanel buttons;
 	int mainpot=0;
 	Game game;
+	ChatReader chatreader;
+
 	public App(TCPClient TA,String a){
+		TA.setApp(this);
 		T=TA;
+
 		this.setResizable(false);
 
 		setSize(1000,700);
@@ -79,7 +83,7 @@ public class App extends JFrame {
 		DefaultCaret caret= (DefaultCaret) chatarea.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		chatscroll= new JScrollPane(chatarea,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		ChatReader chatreader=new ChatReader(this);
+		chatreader=new ChatReader(this);
 		chatreader.start();
 		chatfield.addKeyListener(new KeyChatListener(this));
 		bnotallowed();
@@ -87,7 +91,7 @@ public class App extends JFrame {
 		buttons= new JPanel();
 		JPanel mid=new JPanel();
 		JPanel west=new JPanel();
-		JLabel copy=new JLabel("Copyright");
+		JLabel copy=new JLabel("Copyright SZB & UD");
 		mid.setLayout(new BoxLayout(mid,BoxLayout.X_AXIS));
 		JLabel space[] =new JLabel[5];
 
