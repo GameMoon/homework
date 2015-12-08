@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 
 import javax.swing.*;
 
@@ -17,35 +18,48 @@ public class authentikation extends JFrame {
 	private TCPClient T;
 	String sendpassword;
 	String sendusername;
+	static JButton login;
+	static JButton reg;
+	int money;
+	JPanel top;
+	JPanel mid;
+	JPanel down;
+	JLabel user;
+	JLabel pass;
+	JLabel topLabel;
 	public authentikation(TCPClient TA){
 		T=TA;
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/3-this.getSize().width/2,(dim.height/2-this.getSize().height/2));
 		setTitle("Login");
-		JPanel top= new JPanel();
-		JPanel mid= new JPanel();
-		JPanel down= new JPanel();
-		JLabel user= new JLabel("Username:");
-		JLabel pass= new JLabel("Password:");
-		JLabel topLabel= new JLabel("Please Login:");
+		top= new JPanel();
+		mid= new JPanel();
+		down= new JPanel();
+		user= new JLabel("Username:");
+		pass= new JLabel("Password:");
+		topLabel= new JLabel("Please Login:");
 		topLabel.setFont(new Font(null, Font.PLAIN, 18));
 		JTextField name= new JTextField();
 		name.setColumns(15);
-		JTextField word= new JTextField();
+		JPasswordField word= new JPasswordField();
 		word.setColumns(15);
-		JButton login=new JButton("Login");
+		login=new JButton("Login");
 		login.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if((!name.getText().equals("")) && (!word.getText().equals(""))) {
-					//name.setText("");
-					//world.setText("");
+					String command="fake";
 					try {
-						//MD.Mdhash(name.getText());
 						sendpassword=MD.Mdhash(word.getText());
-						sendusername=name.getText();
-						T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
+						sendusername=Normalizer.normalize(name.getText(),Normalizer.Form.NFD);
+						if(T.isAlive()){
+							T.sendCommand("$-verify-"+sendusername+"-"+sendpassword+"-$");
+						}
+						else {
+							System.out.println("Nincs Socket");
+							return;
+						}
 
 					} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
 						// TODO Auto-generated catch block
@@ -55,41 +69,44 @@ public class authentikation extends JFrame {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-					while(T.getAllCommand().size()==0);
-					//System.out.println(T.getAllCommand().size());
-					String command=T.getCommand();
-					System.out.println(command);
-					if(command.equals("$-ok-$")){
+
+
+
+					while(command.equals("fake")){
+						command=T.getCommand();
+					};
+
+					if(command!=null && command.equals("$-ok-$")){
 						try {
 							T.sendCommand("$-start-"+sendusername+"-"+sendpassword+"-$");
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						App poker= new App();
+
+						App poker= new App(T,sendusername);
+						dispose();
 					}
 					else{
 						JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
 					}
-					T.getAllCommand().clear();
+
 				}
 				else
 				{
 					JOptionPane.showMessageDialog(null,"PASSWORD OR USERNAME INCORRECT(1)", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
-					//name.setText("");
-					//word.setText("");
 				}
 			}
 
 		});
-		JButton reg = new JButton("Registration");
+		reg = new JButton("Registration");
 		reg.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				registration rg=new registration(); 
-
+				registration rg=new registration(T); 
+				login.setEnabled(false);
+				reg.setEnabled(false);
 			}
 
 		});

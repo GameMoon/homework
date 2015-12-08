@@ -1,10 +1,13 @@
 package client;
 
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
 public class Main {
-	public static TCPClient TC;
+	
 	public static void main(String args[]){
-		TC= new TCPClient("92.249.223.118",7658);
+		TCPClient TC= new TCPClient(args[0],7658);    // IP-Adresse und Socket
 		authentikation a= new authentikation(TC);
-        
+
 	}
 }

@@ -6,13 +6,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 
 import javax.swing.*;
 
 
 public class registration extends JFrame {
-	public registration(){
-		
+	TCPClient T;
+	String sendregusername;
+	String sendregpassword;
+	public registration(TCPClient t){
+		T=t;
 		JButton reg = new JButton("Registration");
 		JButton back = new JButton("Back");
 		JTextField name = new JTextField();
@@ -27,9 +35,9 @@ public class registration extends JFrame {
 		JPanel top= new JPanel();
 		JPanel down= new JPanel();
 		JPanel mid = new JPanel();
-	    setSize(300,300);
-	    setResizable(false);
-	    top.setSize(300,100);
+		setSize(300,300);
+		setResizable(false);
+		top.setSize(300,100);
 		top.add(titel);
 		top.add(choose,BorderLayout.SOUTH);
 		mid.add(u,BorderLayout.WEST);
@@ -42,14 +50,109 @@ public class registration extends JFrame {
 		add(top, BorderLayout.NORTH);
 		add(mid, BorderLayout.CENTER);
 		add(down , BorderLayout.SOUTH);
-		
+
 		String infoMessage= new String("hsguhfdg");
 		back.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				dispose();
+				authentikation.login.setEnabled(true);
+				authentikation.reg.setEnabled(true);
 				//JOptionPane.showMessageDialog(null, "Ooopss...", "i", JOptionPane.INFORMATION_MESSAGE);
+			}
+
+		});
+		reg.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(!name.getText().contains("-") && !name.getText().contains("$") && (!name.getText().equals("")) && (!word.getText().equals("")) && (name.getText().matches("\\A\\p{ASCII}*\\z"))) {
+					//name.setText("");
+					//world.setText("");
+
+					String command="fake";
+					try {
+						sendregusername=name.getText();
+						sendregpassword=MD.Mdhash(word.getText());
+								T.sendCommand("$-register-"+sendregusername+"-"+sendregpassword+"-$");
+						//command=T.getCommand();
+
+					} catch (NoSuchAlgorithmException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					while(command.equals("fake")){
+						command=T.getCommand();
+					};
+					System.out.println(command);
+					//System.out.println(T.getAllCommand().size());
+
+					System.out.println(T.getAllCommand().size());
+					if(command!=null && command.equals("$-ok-$")){
+						dispose();
+						authentikation.login.setEnabled(true);
+						authentikation.reg.setEnabled(true);
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"USERNAME IS ALREADY IN USE", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
+					}
+
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,"WRONG USERNAME OR PASSWORD", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
+					//name.setText("");
+					//word.setText("");
+				}
+			}
+		});
+		addWindowListener(new WindowListener(){
+
+			
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				authentikation.login.setEnabled(true);
+				authentikation.reg.setEnabled(true);
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
 			}
 			
 		});
@@ -57,6 +160,6 @@ public class registration extends JFrame {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
-		
-}
+
+	}
 }
