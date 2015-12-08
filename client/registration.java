@@ -67,7 +67,7 @@ public class registration extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(!name.getText().contains("-") && !name.getText().contains("$") && (!name.getText().equals("")) && (!word.getText().equals("")) && (name.getText().matches("\\A\\p{ASCII}*\\z"))) {
+				if(!name.getText().contains("'") && !(name.getText().length()>15) && !name.getText().contains("-") && !name.getText().contains("$") && (!name.getText().equals("")) && (!word.getText().equals("")) && (name.getText().matches("\\A\\p{ASCII}*\\z"))) {
 					//name.setText("");
 					//world.setText("");
 
