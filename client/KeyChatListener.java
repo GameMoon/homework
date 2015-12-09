@@ -13,12 +13,10 @@ App app;
 	@Override
 	public void keyPressed(KeyEvent arg0) {
 		if(arg0.getKeyCode()==KeyEvent.VK_ENTER){
-			try {
+			
 				app.T.sendCommand("$-chat-"+app.chatfield.getText().replace(" ", "_")+"-$");
 				app.chatfield.setText("");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
 		}
 	}
 

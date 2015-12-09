@@ -34,11 +34,8 @@ public class Raise extends JFrame {
 					money.setText("");
 				}
 				if(!money.getText().equals("") && Integer.parseInt(money.getText())>0 && digit(money.getText())==true && Integer.parseInt(money.getText())<=Integer.parseInt(app.acounttable.getText())){
-					try {
-						T.sendCommand("$-raise-"+money.getText()+"-$");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}	
+
+					T.sendCommand("$-raise-"+money.getText()+"-$");	
 					dispose();
 				}
 				else{

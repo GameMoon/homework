@@ -29,7 +29,7 @@ public class TCPClient extends Thread {
 		} catch (IOException e) {
 			
 			JOptionPane.showMessageDialog(null,"Cannot Connect to Server.\n Please try again later.","Oppss...",JOptionPane.OK_OPTION);
-			System.err.println("Can't open that Socket (" + ip + ":" + port + ")");
+			//System.err.println("Can't open that Socket (" + ip + ":" + port + ")");
 			System.exit(0);
 		}
 	}
@@ -60,9 +60,17 @@ public class TCPClient extends Thread {
 		}
 	}
 
-	public void sendCommand(String data) throws IOException {
-		DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
-		dataOut.writeBytes(data + '\n');
+	public void sendCommand(String data)  {
+		
+		
+		try {
+			DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
+			dataOut.writeBytes(data + '\n');
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null,"Connection lost to Server","Opss..",JOptionPane.OK_OPTION);
+			System.exit(0);
+			e.printStackTrace();
+		}
 	}
 
 	public String getCommand() {

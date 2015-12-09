@@ -77,13 +77,10 @@ public class authentikation extends JFrame {
 					};
 
 					if(command!=null && command.equals("$-ok-$")){
-						try {
+						
 							T.sendCommand("$-start-"+sendusername+"-"+sendpassword+"-$");
 							App poker= new App(T,sendusername);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}					
+										
 						dispose();
 					}
 					else{
