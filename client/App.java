@@ -130,11 +130,9 @@ public class App extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					T.sendCommand("$-call-$");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+
+				T.sendCommand("$-call-$");
+
 				bnotallowed();
 			}
 
@@ -144,11 +142,9 @@ public class App extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					T.sendCommand("$-fold-$");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+
+				T.sendCommand("$-fold-$");
+
 				bnotallowed();
 
 			}
@@ -168,12 +164,9 @@ public class App extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					T.sendCommand("$-ready-$");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
+				T.sendCommand("$-ready-$");
+
 				ready.setEnabled(false);
 			}
 
@@ -198,7 +191,7 @@ public class App extends JFrame {
 				int value = opt.showConfirmDialog(null, "Are you sure?");
 				if (value == JOptionPane.YES_OPTION) {
 					System.exit(0);
-					
+
 				}
 				if (value == JOptionPane.NO_OPTION) {
 					opt.setVisible(false);

@@ -24,7 +24,7 @@ public class ChatReader extends Thread {
 				if(command[1].equals("chat")){
 					String format=app.chatarea.getText()+command[2];
 					app.chatarea.setFont(new Font(null,Font.ITALIC| Font.BOLD, 12));
-					app.chatarea.setText((app.chatarea.getText()+"["+command[2])+"]"+":"+command[3].replace("_", " ")+"\n");
+					app.chatarea.setText((app.chatarea.getText()+"["+command[2])+"]"+":  "+command[3].replace("_", " ")+"\n");
 					//app.chatarea.setFont(new Font(null,Font.ITALIC, 12));
 					//app.chatarea.setText((app.chatarea.getText()+command[3].replace("_", " ")+"\n"));
 				}
