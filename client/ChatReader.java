@@ -42,9 +42,7 @@ public class ChatReader extends Thread {
 						if(command[i].equals(app.name)) app.acounttable.setText(command[i+1]);
 						playerint[0]=Integer.parseInt(command[i+1]); // money
 						playerint[1]=Integer.parseInt(command[i+2]); // kartya1 
-						//System.out.println(playerint[1]);
 						playerint[2]=Integer.parseInt(command[i+3]); // kartya2
-						//System.out.println(playerint[2]);
 						app.players.put(command[i], playerint);      // playername
 					}
 					app.game.repaint();

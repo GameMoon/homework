@@ -27,7 +27,10 @@ public class TCPClient extends Thread {
 			socket = new Socket(ip, port);
 			this.start();
 		} catch (IOException e) {
+			
+			JOptionPane.showMessageDialog(null,"Cannot Connect to Server.\n Please try again later.","Oppss...",JOptionPane.OK_OPTION);
 			System.err.println("Can't open that Socket (" + ip + ":" + port + ")");
+			System.exit(0);
 		}
 	}
 	public void setApp(App app){

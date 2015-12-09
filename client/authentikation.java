@@ -106,6 +106,8 @@ public class authentikation extends JFrame {
 				registration rg=new registration(T); 
 				login.setEnabled(false);
 				reg.setEnabled(false);
+				word.setText("");
+				name.setText("");
 			}
 
 		});

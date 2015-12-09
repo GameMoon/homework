@@ -202,7 +202,6 @@ public class App extends JFrame {
 				}
 				if (value == JOptionPane.NO_OPTION) {
 					opt.setVisible(false);
-					System.out.println("dfd");
 					return;
 
 				}  

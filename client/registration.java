@@ -59,7 +59,7 @@ public class registration extends JFrame {
 				dispose();
 				authentikation.login.setEnabled(true);
 				authentikation.reg.setEnabled(true);
-				//JOptionPane.showMessageDialog(null, "Ooopss...", "i", JOptionPane.INFORMATION_MESSAGE);
+				
 			}
 
 		});
@@ -102,7 +102,7 @@ public class registration extends JFrame {
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null,"WRONG USERNAME OR PASSWORD", "Ooopss...",  JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "INCORRECT USRNAME OR PASSWORD\n -Maximal 15 characters\n -Only ASCII characters\n -Forbidden:  '  ","Opsss..", JOptionPane.OK_OPTION);
 					//name.setText("");
 					//word.setText("");
 				}
