@@ -72,16 +72,15 @@ public class Game extends Thread {
     public synchronized void waitingForPlayers() {
         int readyPlayers = 0;
         if(players.size()<2) {
-            try {
                 dealerid = 0;
                 pot = 0;
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         for (Player currentPlayer : players) {
             if (currentPlayer.isReady() && currentPlayer.getMoney() >= bigBlind) readyPlayers++;
+            if( currentPlayer.getSocket() == null) {
+                tcpServer.addCommand(currentPlayer.getSocket(),"$-stop-$");
+                tcpServer.getGameManager().wakeup();
+            }
         }
         if (readyPlayers == players.size() && players.size() > 1) currentState++;
         else try {
@@ -161,6 +160,7 @@ public class Game extends Thread {
             if (players.get(k).isReady()) {
                 tcpServer.sendCommand(players.get(k).getSocket(), "$-waitingforyou-$"); //Waiting for player action
                 int counter =0;
+                if(players.get(k).getSocket() == null) players.get(k).setAction(Player.Action.FOLD);
                 while(players.get(k).getAction() == Player.Action.NONE){
                         if(counter == Constants.maxWaitTime) players.get(k).setAction(Player.Action.FOLD);
                         else{
@@ -185,10 +185,11 @@ public class Game extends Thread {
                 refreshPlayerData();
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("kilepett" + (k - 1));
             return k - 1;
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+
         }
         return k;
     }
@@ -279,6 +280,10 @@ public class Game extends Thread {
         bigblindid = smallblindid + 1;
         if (bigblindid == players.size()) bigblindid = 0;
         for (Player p : players) {
+            if(p.getSocket() == null){
+                tcpServer.addCommand(p.getSocket(),"$-stop-$");
+                tcpServer.getGameManager().wakeup();
+            }
             p.setReady(false);
             tcpServer.sendCommand(p.getSocket(), "$-dealer-" + dealerid + "-$");
         }
@@ -379,6 +384,10 @@ public class Game extends Thread {
                     if (winnerValue > 13) {
                         int highcardofWinner = winner.getCard(0).getValue() > winner.getCard(1).getValue() ? winner.getCard(0).getValue() : winner.getCard(1).getValue();
                         int highcardofPlayer = p.getCard(0).getValue() > p.getCard(1).getValue() ? p.getCard(0).getValue() : p.getCard(1).getValue();
+
+                        if(p.getCard(0).getValue() == 1 || p.getCard(1).getValue() == 1) highcardofPlayer = 14;
+                        if(winner.getCard(0).getValue() == 1 || winner.getCard(1).getValue() == 1) highcardofWinner = 14;
+
                         if (highcardofPlayer > highcardofWinner) {
                             winners.clear();
                             winners.add(p);

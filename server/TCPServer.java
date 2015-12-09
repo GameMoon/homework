@@ -38,7 +38,7 @@ public class TCPServer extends Thread {
         while (running) { //Receiving Data
             try {
                 newClient = socket.accept();
-               // newClient.setSoTimeout(Constants.maxTimedOut); ideiglenes
+                newClient.setSoTimeout(Constants.maxTimedOut);
                 new TCPClientManager(newClient,this).start();
                 connectedClients.add(newClient);
 
@@ -54,12 +54,17 @@ public class TCPServer extends Thread {
 
     public synchronized void sendCommand(Socket client, String data) {
         try {
-            DataOutputStream dataout = new DataOutputStream(client.getOutputStream());
-            dataout.writeBytes(data + '\n');
-            sleep(100);
+            if(client != null) {
+                DataOutputStream dataout = new DataOutputStream(client.getOutputStream());
+                dataout.writeBytes(data + '\n');
+                sleep(100);
+            }
 
         } catch (IOException e) {
-            System.err.println("Failed to send command");
+            connectedClients.remove(client);
+            addCommand(client,"$-stop-$");
+            gameManager.wakeup();
+            client = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

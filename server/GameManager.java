@@ -60,7 +60,6 @@ public class GameManager extends Thread {
                     } else tcpServer.sendCommand(socket, "$-error-wrongusernameorpassword-$");
                     usedCommands.add(socket);
                 } else if (command[1].equals("start")) {
-                    System.out.println("start");
                     newPlayer(command[2], command[3], socket);
                     usedCommands.add(socket);
                 } else if (command[1].equals("stop") || command[1].equals("timedout")) {
@@ -92,8 +91,7 @@ public class GameManager extends Thread {
                 } else if (command[1].equals("ready")) {
                     Player sender = players.stream().filter((p) -> p.getSocket() == socket).findFirst().get();
                     if (!tableManager.getTable(sender.getTableId()).getGame().isRunning()) {
-                        if (sender.isReady()) sender.setReady(false);
-                        else sender.setReady(true);
+                        sender.setReady(true);
                         tableManager.getTable(sender.getTableId()).getGame().sendMessageAll(sender.getName() + " is ready");
                         tableManager.getTable(sender.getTableId()).getGame().wakeup();
                     }

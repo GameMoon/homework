@@ -23,8 +23,6 @@ public class TCPClientManager extends Thread {
                 if (first > 0) {
                     BufferedReader dataIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
                     tcpServer.addCommand(client,(char)(first)+ dataIn.readLine());
-                    System.out.println(tcpServer.getState());
-                    System.out.println(tcpServer.getGameManager().getState());
                     if(tcpServer.getGameManager().getState() == State.WAITING)  tcpServer.getGameManager().wakeup();
                 }
 
@@ -39,5 +37,3 @@ public class TCPClientManager extends Thread {
     }
 
 }
-
-//188.143.102.191

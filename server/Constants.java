@@ -5,8 +5,8 @@ public class Constants {
     public static final int numberofTables = 10;
     public static final int maxPlayersatTable = 8;
     public static final int numberofCards = 52;
-    public static final double versionNumber = 0.8;
-    public static final int maxTimedOut = 10000;
+    public static final double versionNumber = 0.9;
+    public static final int maxTimedOut = 60000;
     public static final int maxWaitTime = 15;
     public static final int defualtTableNumber = 4;
     public static final int delay = 50;
