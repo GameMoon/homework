@@ -14,12 +14,12 @@ public class ChatReader extends Thread {
 	public ChatReader(App a) {
 		app=a;
 	}
-	public synchronized void wakeup(){
-		notify();
-	}
+	public synchronized void wakeup(){ notifyAll();}
+
 	public synchronized void run() {
 		while(app.T.isAlive()){
 			String[] command = app.T.getCommand().split("-");
+
 			if (command[0].equals("$") && command[command.length - 1].equals("$")) {
 				if(command[1].equals("chat")){
 					String format=app.chatarea.getText()+command[2];
@@ -34,6 +34,7 @@ public class ChatReader extends Thread {
 					app.acounttable.setText(command[3]);
 				}
 				else if(command[1].equals("playerinfo")){
+					//System.out.println("valami");
 					app.playersnum=(command.length-2)/2;
 					app.players.clear();
 					for(int i=2;i<command.length-2;i=i+4){
@@ -93,7 +94,8 @@ public class ChatReader extends Thread {
 				}
 			}
 			try {
-				wait();
+				if(app.T.getAllCommand().size() == 0) wait();
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

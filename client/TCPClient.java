@@ -46,7 +46,7 @@ public class TCPClient extends Thread {
 					System.out.println(command);
 					if (command.equals("closed")) Stop();
 					incomingCommands.add(command);
-					if(app != null) app.chatreader.wakeup();
+					if(app != null && app.chatreader != null && app.chatreader.getState() == State.WAITING) app.chatreader.wakeup();
 				}
 			}
 			socket.close();

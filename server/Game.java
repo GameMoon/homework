@@ -66,17 +66,28 @@ public class Game extends Thread {
     public void setRunning(boolean state) {
         isRunning = state;
     }
-
-    public void waitingForPlayers() {
+    public synchronized void wakeup(){
+        notify();
+    }
+    public synchronized void waitingForPlayers() {
         int readyPlayers = 0;
-        if(players.isEmpty()) return;
+        if(players.size()<2) {
+            try {
+                dealerid = 0;
+                pot = 0;
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         for (Player currentPlayer : players) {
             if (currentPlayer.isReady() && currentPlayer.getMoney() >= bigBlind) readyPlayers++;
         }
         if (readyPlayers == players.size() && players.size() > 1) currentState++;
-        if (players.size() < 2) {
-            dealerid = 0;
-            pot = 0;
+        else try {
+            wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -147,11 +158,17 @@ public class Game extends Thread {
 
     public int waitingForPlayerAction(int k, int round, boolean blind) {
         try {
-            boolean exit = false;
             if (players.get(k).isReady()) {
                 tcpServer.sendCommand(players.get(k).getSocket(), "$-waitingforyou-$"); //Waiting for player action
-
-                while(players.get(k).getAction() == Player.Action.NONE);
+                int counter =0;
+                while(players.get(k).getAction() == Player.Action.NONE){
+                        if(counter == Constants.maxWaitTime) players.get(k).setAction(Player.Action.FOLD);
+                        else{
+                            counter++;
+                            Thread.sleep(1000);
+                        }
+                        if(counter == 5) sendMessageAll(players.get(k).getName()+", you have 10 sec to choose");
+                }
                 if(players.get(k).getAction() == Player.Action.RAISE && round>0){
                     players.get(k).setAction(Player.Action.CALL);
                 }
@@ -161,15 +178,17 @@ public class Game extends Thread {
                     fold(k, round, blind);
                 } else if (players.get(k).getAction() == Player.Action.CALL) { //CALL
                     call(k, round, blind);
-                    exit = true;
+                } else{ //Minden mas esetben fold
+                    fold(k,round,blind);
                 }
                 players.get(k).setAction(Player.Action.NONE);
                 refreshPlayerData();
-                if(round > 0 && exit) return -1;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("kilepett" + (k - 1));
             return k - 1;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return k;
     }
@@ -204,11 +223,10 @@ public class Game extends Thread {
                         tcpServer.sendCommand(p.getSocket(), "$-active-" + k + "-$");
                     }
                     k = waitingForPlayerAction(k, round, blind);
-                    if(k == -1) break loop;
                 }
-                if (checkFoldWin()) {
-                    break loop;
-                }
+                if (checkFoldWin())  break loop;
+                if(checkRaiseOK()) break loop;
+
             }
             for (int k = 0; k < startindex; k++) {
                 if (players.get(k).isReady()) {
@@ -217,23 +235,26 @@ public class Game extends Thread {
                     }
                     k = waitingForPlayerAction(k, round, blind);
                 }
-                if (checkFoldWin()) {
-                    break loop;
-                }
+                if (checkFoldWin()) break loop;
+                if(checkRaiseOK()) break loop;
+
             }
-            int numberofraisedpeople = 0;
-            int numberofactiveplayers = 0;
-            for (Player p : players) {
-                if (p.getRaiseAmmount() == raiseAmmount && p.isReady()) numberofraisedpeople++;
-                if (p.isReady()) numberofactiveplayers++;
-            }
-            if (numberofraisedpeople == numberofactiveplayers) break loop;
+            if(checkRaiseOK()) break loop;
+            if (raiseAmmount == 0) break loop;
             round++;
             blind = false;
         }
         currentState++;
     }
-
+    private boolean checkRaiseOK(){
+        int numberofraisedpeople = 0;
+        int numberofactiveplayers = 0;
+        for (Player p : players) {
+            if (p.getRaiseAmmount() == raiseAmmount && p.isReady()) numberofraisedpeople++;
+            if (p.isReady()) numberofactiveplayers++;
+        }
+        return numberofraisedpeople == numberofactiveplayers && raiseAmmount > 0;
+    }
     private void sendTurn() {
         for (Player p : players) {
             tcpServer.sendCommand(p.getSocket(), "$-turn-" + flop[3].getId() + "-$");
@@ -265,7 +286,7 @@ public class Game extends Thread {
         System.out.println("Game End");
     }
 
-    public boolean checkFoldWin() {
+    private boolean checkFoldWin() {
         int activePlayers = 0;
         for (Player p : players) {
             if (p.isReady()) activePlayers++;
@@ -331,7 +352,7 @@ public class Game extends Thread {
         }
         if (activePlayers == 1) {
             for (Player p : players) {
-                winner = p;
+                if(p.isReady()) winner = p;
             }
             for (Player p : players) {
                 tcpServer.sendCommand(p.getSocket(), "$-winner-" + winner.getName() + "-" + pot + "-$");

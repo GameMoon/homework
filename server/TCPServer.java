@@ -1,5 +1,6 @@
 package server;
 
+import javax.naming.SizeLimitExceededException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,10 +11,15 @@ public class TCPServer extends Thread {
     private ServerSocket socket;
     private ArrayList<Socket> connectedClients;
     private Map<Socket, String> incommingCommands;
+    private Map<Socket,TCPClientManager> tcpClientManagers;
+    private GameManager gameManager;
 
-    public TCPServer(int port) {
+    public GameManager getGameManager(){ return gameManager;}
+    public TCPServer(int port,GameManager gameManager) {
         running = true;
         connectedClients = new ArrayList<>();
+        tcpClientManagers = new HashMap<>();
+        this.gameManager = gameManager;
         incommingCommands = Collections.synchronizedMap(new HashMap<>());
         try {
             this.socket = new ServerSocket(port);
@@ -26,7 +32,6 @@ public class TCPServer extends Thread {
     public void Stop() {
         running = false;
     }
-
     @Override
     public void run() {
         Socket newClient;
@@ -47,11 +52,12 @@ public class TCPServer extends Thread {
         return connectedClients;
     }
 
-    public void sendCommand(Socket client, String data) {
+    public synchronized void sendCommand(Socket client, String data) {
         try {
             DataOutputStream dataout = new DataOutputStream(client.getOutputStream());
             dataout.writeBytes(data + '\n');
-            Thread.sleep(Constants.delay);
+            sleep(100);
+
         } catch (IOException e) {
             System.err.println("Failed to send command");
         } catch (InterruptedException e) {

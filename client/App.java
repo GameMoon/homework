@@ -53,7 +53,7 @@ public class App extends JFrame {
 	JPanel buttons;
 	int mainpot=0;
 	Game game;
-	ChatReader chatreader;
+	ChatReader chatreader = null;
 
 	public App(TCPClient TA,String a){
 		TA.setApp(this);
