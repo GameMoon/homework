@@ -363,6 +363,9 @@ public class Game extends Thread {
                 tcpServer.sendCommand(p.getSocket(), "$-winner-" + winner.getName() + "-" + pot + "-$");
                 tcpServer.sendCommand(p.getSocket(), "$-chat-[Server]-The_winner_is_" + winner.getName() + "!-$");
             }
+
+                winner.setMoney(winner.getMoney() + pot);
+
             pot = 0;
             refreshPlayerData();
         } else {
@@ -385,8 +388,9 @@ public class Game extends Thread {
                         int highcardofWinner = winner.getCard(0).getValue() > winner.getCard(1).getValue() ? winner.getCard(0).getValue() : winner.getCard(1).getValue();
                         int highcardofPlayer = p.getCard(0).getValue() > p.getCard(1).getValue() ? p.getCard(0).getValue() : p.getCard(1).getValue();
 
-                        if(p.getCard(0).getValue() == 1 || p.getCard(1).getValue() == 1) highcardofPlayer = 14;
-                        if(winner.getCard(0).getValue() == 1 || winner.getCard(1).getValue() == 1) highcardofWinner = 14;
+                        if (p.getCard(0).getValue() == 1 || p.getCard(1).getValue() == 1) highcardofPlayer = 14;
+                        if (winner.getCard(0).getValue() == 1 || winner.getCard(1).getValue() == 1)
+                            highcardofWinner = 14;
 
                         if (highcardofPlayer > highcardofWinner) {
                             winners.clear();
@@ -400,6 +404,7 @@ public class Game extends Thread {
                     }
                 }
             }
+
             //Money split
             for (Player w : winners) {
                 w.setMoney(w.getMoney() + pot / winners.size());
@@ -432,11 +437,12 @@ public class Game extends Thread {
         currentState++;
     }
 
-    public void saveGame() {
+    public void saveGame(String name) {
         ArchiveGame agame = new ArchiveGame(this);
         FileOutputStream fileOut = null;
+        System.out.println("Start saving");
         try {
-            fileOut = new FileOutputStream("games/game" + System.currentTimeMillis() + ".ser");
+            fileOut = new FileOutputStream("games/" + name + ".ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(agame);
             out.close();
@@ -447,13 +453,13 @@ public class Game extends Thread {
             e.printStackTrace();
         }
         currentState++;
-        System.out.println("game" + System.currentTimeMillis() + ".ser saved");
+        System.out.println(name + ".ser saved");
     }
 
     public void loadGame(String name) {
         ArchiveGame e = null;
         try {
-            FileInputStream fileIn = new FileInputStream("games/game" + name + ".ser");
+            FileInputStream fileIn = new FileInputStream("games/" + name + ".ser");
             ObjectInputStream in = new ObjectInputStream(fileIn);
             e = (ArchiveGame) in.readObject();
             in.close();
@@ -545,6 +551,10 @@ public class Game extends Thread {
         }
         if (addMoneyToPot(players.get(k), money)) {
             players.get(k).setRaiseAmmount(raiseAmmount);
+        }
+        else{
+            money = players.get(k).getMoney();
+            addMoneyToPot(players.get(k),money);
         }
 
         if (raiseAmmount > 0) sendMessageAll(players.get(k).getName() + " called");

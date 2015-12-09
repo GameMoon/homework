@@ -5,11 +5,11 @@ public class Constants {
     public static final int numberofTables = 10;
     public static final int maxPlayersatTable = 8;
     public static final int numberofCards = 52;
-    public static final double versionNumber = 0.9;
+    public static final double versionNumber = 1.0;
     public static final int maxTimedOut = 60000;
-    public static final int maxWaitTime = 15;
+    public static final int maxWaitTime = 20;
     public static final int defualtTableNumber = 4;
-    public static final int delay = 50;
+    public static final int delay = 10;
     public static final String mysqlUserName = "admin";
     public static String mysqlPassword = "titkosajelszo";
     public static String mysqlServerName = "s2.gmhost.hu";
