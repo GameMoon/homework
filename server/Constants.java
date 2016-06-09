@@ -11,7 +11,7 @@ public class Constants {
     public static final int defualtTableNumber = 4;
     public static final int delay = 10;
     public static final String mysqlUserName = "admin";
-    public static String mysqlPassword = "titkosajelszo";
+    public static String mysqlPassword = "************";
     public static String mysqlServerName = "s2.gmhost.hu";
     public static String mysqlDatabase = "javapoker";
 
